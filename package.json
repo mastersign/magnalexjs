@@ -2,7 +2,7 @@
   "name": "magnalex",
   "version": "0.1.0",
   "description": "Load Bible text in a structural fashion.",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
     "test": "mocha"
   },
