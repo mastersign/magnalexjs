@@ -162,6 +162,16 @@ wrappy@1:
   resolved "https://registry.yarnpkg.com/wrappy/-/wrappy-1.0.2.tgz#b5243d8f3ec1aa35f1364605bc0d1036e30ab69f"
   integrity sha1-tSQ9jz7BqjXxNkYFvA0QNuMKtp8=
 
+xmlbible-kjv@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/xmlbible-kjv/-/xmlbible-kjv-1.0.0.tgz#37bb349072c52221c5e7cca33d752ef9bbff4a39"
+  integrity sha512-fTElmZEd413JeP0BdMhFqbWpt2vmx5gDEZfqvXfQuIwvlC/VU2JysP7xGELjhS5jhhooGb9iKuCBKCT4xKk2gw==
+
+xmlbible-lut1912@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/xmlbible-lut1912/-/xmlbible-lut1912-1.0.0.tgz#a1e290827b5a9132086b98550f72a7f6350e87e3"
+  integrity sha512-xh/A4Vy7NRO0ckD4zxLecvWI9nqVf4DrPqL8eQI+xXI1UXZ/1txDiHGxeGbQkuN1MbyioUs4Vg2JL7GBRfbzUA==
+
 xmldom@^0.1.27:
   version "0.1.27"
   resolved "https://registry.yarnpkg.com/xmldom/-/xmldom-0.1.27.tgz#d501f97b3bdb403af8ef9ecc20573187aadac0e9"

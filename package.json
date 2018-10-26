@@ -16,6 +16,8 @@
   "license": "MIT",
   "dependencies": {
     "lodash": "^4.17.11",
+    "xmlbible-kjv": "^1.0.0",
+    "xmlbible-lut1912": "^1.0.0",
     "xmldom": "^0.1.27"
   },
   "devDependencies": {

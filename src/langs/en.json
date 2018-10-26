@@ -13,7 +13,10 @@
     "translationEnd": "]"
   },
   "vocabulary": {
-    "chapter": "Chapter"
+    "verse": "Verse",
+    "verses": "Verses",
+    "chapter": "Chapter",
+    "chapters": "Chapters"
   },
   "books": [
     { "no": 1, "id": "1Mo", "shortName": "Gen", "name": "Genesis" },

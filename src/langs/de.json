@@ -13,7 +13,10 @@
     "translationEnd": "]"
   },
   "vocabulary": {
-    "chapter": "Kapitel"
+    "verse": "Vers",
+    "verses": "Verse",
+    "chapter": "Kapitel",
+    "chapters": "Kapitel"
   },
   "books": [
     { "no": 1, "id": "1Mo", "shortName": "1. Mo", "name": "1. Mose" },
@@ -86,11 +89,11 @@
     
     { "no": 67, "id": "Tob", "shortName": "Tob", "name": "Tobias" },
     { "no": 68, "id": "Jdt", "shortName": "Jdt", "name": "Judith" },
-    { "no": 69, "id": "1Ma", "shortName": "1. Ma", "name": "1. Ma" },
-    { "no": 70, "id": "2Ma", "shortName": "2. Ma", "name": "2. Ma" },
+    { "no": 69, "id": "1Ma", "shortName": "1. Ma", "name": "1. Makkabäer" },
+    { "no": 70, "id": "2Ma", "shortName": "2. Ma", "name": "2. Makkabäer" },
     { "no": 71, "id": "Wis", "shortName": "Wis", "name": "Weisheit" },
     { "no": 72, "id": "Sir", "shortName": "Sir", "name": "Sirach" },
-    { "no": 73, "id": "Bar", "shortName": "Bar", "name": "Bar" },
+    { "no": 73, "id": "Bar", "shortName": "Bar", "name": "Baruch" },
     { "no": 74, "id": "Sus", "shortName": "Sus", "name": "Sus" },
     { "no": 75, "id": "Prm", "shortName": "Prm", "name": "Prm" },
     { "no": 76, "id": "Esg", "shortName": "Esg", "name": "Esg" }
