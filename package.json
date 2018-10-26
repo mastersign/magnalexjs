@@ -1,0 +1,24 @@
+{
+  "name": "magnalex",
+  "version": "0.1.0",
+  "description": "Load Bible text in a structural fashion.",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "keywords": [
+    "bible"
+  ],
+  "author": {
+    "name": "Tobias Kiertscher",
+    "email": "dev@mastersign.de"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "lodash": "^4.17.11",
+    "xmldom": "^0.1.27"
+  },
+  "devDependencies": {
+    "mocha": "^5.2.0"
+  }
+}

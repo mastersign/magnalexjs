@@ -1,0 +1,9 @@
+{
+	"esversion": 6,
+	"eqeqeq": true,
+	"trailingcomma": true,
+	"unused": true,
+	"varstmt": true,
+	"asi": true,
+	"eqnull": true
+}
