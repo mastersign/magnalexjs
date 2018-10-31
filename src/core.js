@@ -610,7 +610,6 @@ class Library {
 		this.registerLanguage(langTag, langData.delimiters, langData.vocabulary, langData.books)
 	}
 
-
 	/**
 	 * Sets the default language for parsing references.
 	 *
@@ -633,11 +632,11 @@ class Library {
 	/**
 	 * Register a bible translation.
 	 *
-	 * @param {object} translation - An object with the attributes `shortName`, `name`, `language`
+	 * @param {object} translation - An object with the attributes `shortName`, `name`, `langTag`
 	 */
 	registerTranslation(translation) {
 		this.translations[translation.shortName] =
-			new Translation(translation.shortName, translation.name, translation.language)
+			new Translation(translation.shortName, translation.name, translation.langTag)
 	}
 
 	/**
