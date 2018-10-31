@@ -808,7 +808,7 @@ class Library {
 				lines.push('**' + l.vocabulary.chapter + ' ' + cNo + '**')
 				lines.push('')
 			}
-			lines.push('^' + r.verseNo + '^ ' + v.text)
+			lines.push('^' + r.verseNo + '^ ' + v.text.trim())
 		});
 		lines.push('')
 		lines.push('_' + reference.format(l) + '_')
