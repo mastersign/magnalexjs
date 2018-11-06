@@ -800,7 +800,9 @@ class Library {
 		if (_.isEmpty(verses)) return null
 		const l = this.getLanguage(langTag || verses[0].reference.translation.langTag)
 		const lines = []
-		let cNo = _.size(_.groupBy(verses, v => v.reference.chapterNo)) > 1 ? null : verses[0].reference.chapterNo
+		let cNo = _.size(_.groupBy(verses, v => v.reference.chapterNo)) > 1 ?
+			 null :
+			 verses[0].reference.chapterNo
 		_.forEach(verses, function (v) {
 			const r = v.reference
 			if (cNo !== r.chapterNo) {
