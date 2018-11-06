@@ -817,6 +817,47 @@ class Library {
 		return _.join(_.map(lines, l => '> ' + l), os.EOL)
 	}
 
+	/**
+	 * @param {Reference|ReferenceRange} reference - The reference, which was used to load the verses
+	 * @param {Verse[]}                  verses    - The verses to format
+	 * @param {string=}                  langTag   - The language to use for formatting as IETF tag
+	 * @param {string=}                  cssClass  - The css class to apply to the outermost HTML element
+	 * @return {string} The verses as citation block in HTML5
+	 */
+	toHTML(reference, verses, langTag, cssClass) {
+		if (_.isEmpty(verses)) return null
+		const l = this.getLanguage(langTag || verses[0].reference.translation.langTag)
+		const lines = []
+		let cNo = _.size(_.groupBy(verses, v => v.reference.chapterNo)) > 1 ?
+			null :
+			verses[0].reference.chapterNo
+		let firstContent = true
+		if (cssClass) {
+			lines.push('<blockquote class="' + cssClass + '">')
+		} else {
+			lines.push('<blockquote>')
+		}
+		_.forEach(verses, function (v) {
+			const r = v.reference
+			if (cNo !== r.chapterNo) {
+				cNo = r.chapterNo
+				if (!firstContent) lines.push('</p>')
+				lines.push('<p class="chapter-headline">')
+				lines.push('<strong>' + l.vocabulary.chapter + ' ' + cNo + '</strong>')
+				lines.push('</p>')
+				if (!firstContent) lines.push('<p>')
+			}
+			if (firstContent) {
+				lines.push('<p>')
+				firstContent = false
+			}
+			lines.push('<sup>' + r.verseNo + '</sup>' + v.text.trim())
+		})
+		lines.push('</p>')
+		lines.push('<cite>' + reference.format(l) + '</cite>')
+		lines.push('</blockquote>')
+		return _.join(lines, os.EOL)
+	}
 }
 
 
