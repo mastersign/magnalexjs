@@ -1,6 +1,15 @@
 {
+    "source": {
+        "include": [ "./src/" ]
+    },
+    "opts": {
+        "destination": "./out/",
+        "package": "./package.json",
+        "readme": "./README.md"
+    },
     "plugins": ["plugins/markdown"],
     "templates": {
-    	"cleverLinks": true
+        "cleverLinks": true,
+        "monospaceLinks": true
     }
 }
