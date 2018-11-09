@@ -1,12 +1,27 @@
-image: node:6
+image: node:alpine
 
-# This folder is cached between builds
-# http://docs.gitlab.com/ce/ci/yaml/README.html#cache
 cache:
   paths:
   - node_modules/
 
-test:
+before_script:
+  - yarn install
+
+test (NodeJS latest): &test-definition
+  stage: test
   script:
-   - yarn install
-   - yarn test
+    - yarn test
+  tags:
+    - docker
+
+test (NodeJS 10):
+  image: node:10-alpine
+  <<: *test-definition
+
+test (NodeJS 8):
+  image: node:8-alpine
+  <<: *test-definition
+
+test (NodeJS 6):
+  image: node:6-alpine
+  <<: *test-definition
