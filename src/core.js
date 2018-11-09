@@ -858,6 +858,39 @@ class Library {
 		lines.push('</blockquote>')
 		return _.join(lines, os.EOL)
 	}
+
+	/**
+	 * @param {Reference|ReferenceRange} reference        - The reference, which was used to load the verses
+	 * @param {Verse[]}                  verses           - The verses to format
+	 * @param {string=}                  langTag          - The language to use for formatting as IETF tag
+	 * @param {string=}                  quoteEnvironment - The LaTeX environment for the blockquote; defaults to `quote`
+	 * @return {string} The verses as citation block in LaTeX
+	 */
+	toLaTeX(reference, verses, langTag, quoteEnvironment) {
+		if (_.isEmpty(verses)) return null
+		const l = this.getLanguage(langTag || verses[0].reference.translation.langTag)
+		const env = quoteEnvironment || 'quote'
+		const lines = []
+		let cNo = _.size(_.groupBy(verses, v => v.reference.chapterNo)) > 1 ?
+			null :
+			verses[0].reference.chapterNo
+		lines.push('\\begin{' + env + '}')
+		_.forEach(verses, function (v) {
+			const r = v.reference
+			if (cNo !== r.chapterNo) {
+				cNo = r.chapterNo
+				lines.push('\\textbf{' + l.vocabulary.chapter + ' ' + cNo + '}')
+				lines.push('')
+			}
+			lines.push('\\textsuperscript{' + r.verseNo + '}' + v.text.trim())
+		})
+		lines.push('')
+		lines.push('\\begin{flushright}')
+		lines.push('\\emph{' + reference.format(l) + '}')
+		lines.push('\\end{flushright}')
+		lines.push('\\end{' + env + '}')
+		return _.join(lines, os.EOL)
+	}
 }
 
 
