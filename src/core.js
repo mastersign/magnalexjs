@@ -2,6 +2,57 @@ const os = require('os')
 const _ = require('lodash')
 
 /**
+ * @typedef Delimiters
+ * @type {Object}
+ * @prop {string} bookBegin - A prefix before a book name
+ * @prop {string} bookEnd - A suffix after a book name
+ * @prop {string} chapterToVerse - The binder between a chapter number and the verse number(s)
+ * @prop {string} chapterRange - The binder between the chapter numbers in a range
+ * @prop {string} chapterList - The binder between enumerated chapter numbers
+ * @prop {string} verseRange - The binder between verse numbers in a range
+ * @prop {string} verseList - The binder between enumerated verse numbers
+ * @prop {string} range - The binder between one chapter-verse-reference and another in a range
+ * @prop {string} andFollowing - A symbol, meaning "and following" after a chapter or verse number
+ * @prop {string} translationBegin - A prefix before a translation name
+ * @prop {string} translationEnd - A suffix after a translation name
+ */
+
+/**
+ * @typedef Vocabulary
+ * @type {Object}
+ * @prop {string} verse - A translation for the english word "verse"
+ * @prop {string} verses - A translation for the english word "verses"
+ * @prop {string} chapter - A translation for the english word "chapter"
+ * @prop {string} chapters - A translation for the english word "chapters"
+ */
+
+/**
+ * @typedef FormatOptions
+ * @type {Object}
+ * @prop {string}  language            - The language to use for formatting as IETF tag
+ * @prop {boolean} verseNewLine        - A switch to control whether every verse starts on its own line or not
+ * @prop {boolean} fullBookName        - A switch to control whether the short or the full book name should be used
+ * @prop {boolean} showTranslation     - A switch to control if the translation should be included in references
+ * @prop {boolean} fullTranslationName - A switch to control whether the short ID or the full name of a bible translation should be used
+ * @prop {string}  cssClass            - The CSS class to apply to the outermost HTML element
+ * @prop {string}  texQuoteEnvironment - The TeX environment to use for block quotes
+ */
+
+const defaultFormat = {
+	language: null,
+	verseNewLine: false,
+	fullBookName: false,
+	showTranslation: true,
+	fullTranslationName: false,
+	cssClass: 'mdbible',
+	texQuoteEnvironment: 'quote',
+}
+
+function formatCfg(opt, propName) {
+	return _.get(opt, propName, _.get(defaultFormat, propName))
+}
+
+/**
  * The name of a bible book in a certain language.
  */
 class BookName {
@@ -43,14 +94,18 @@ class BookName {
 	}
 
 	/**
-	 * Format the book name in the given language.
+	 * Format the book name.
 	 *
-	 * @param {Language} language - The language to use
-	 * @return {string}
+	 * @param {Library}       library - The library to use for loading format resources
+	 * @param {FormatOptions} opt     - An object with formatting options
+	 *
+	 * @return {string} The formatted name of the book
 	 */
-	format(language) {
+	format(library, opt) {
+		const language = library.getLanguage(formatCfg(opt, 'language'))
 		const d = language.delimiters
-		return `${d.bookBegin}${this.shortName}${d.bookEnd}`
+		const fullBookName = formatCfg(opt, 'fullBookName')
+		return `${d.bookBegin}${fullBookName ? this.name : this.shortName}${d.bookEnd}`
 	}
 }
 
@@ -90,14 +145,18 @@ class Translation {
 	}
 
 	/**
-	 * Format the translation in the given language.
+	 * Format the translation.
 	 *
-	 * @param {Language} language - The language to use
-	 * @return {string} The short name of the translation
+	 * @param {Library}       library - The library to use for loading format resources
+	 * @param {FormatOptions} opt     - An object with formatting options
+	 *
+	 * @return {string} The formatted name of the translation
 	 */
-	format(language) {
+	format(library, opt) {
+		const language = library.getLanguage(formatCfg(opt, 'language'))
 		const d = language.delimiters
-		return `${d.translationBegin}${this.shortName}${d.translationEnd}`
+		const fullTranslationName = formatCfg(opt, 'fullTranslationName')
+		return `${d.translationBegin}${fullTranslationName ? this.name : this.shortName}${d.translationEnd}`
 	}
 }
 
@@ -108,7 +167,7 @@ class VerseLocation {
 
 	/**
 	 * @param {number}      chapterNo - The number of the chapter (one-based)
-	 * @param {number|null} verseNo   - The number of the verse (one-based), or null if he whole chapter is referenced
+	 * @param {?number} verseNo   - The number of the verse (one-based), or null if he whole chapter is referenced
 	 */
 	constructor(chapterNo, verseNo) {
 		/**
@@ -116,7 +175,7 @@ class VerseLocation {
 		 */
 		this.chapterNo = chapterNo
 		/**
-		 * @prop {number|null} verseNo - The number of the verse (one-based), or null if he whole chapter is referenced
+		 * @prop {?number} verseNo - The number of the verse (one-based), or null if he whole chapter is referenced
 		 */
 		this.verseNo = verseNo
 	}
@@ -125,7 +184,7 @@ class VerseLocation {
 	 * Checks whether the chapterNo matches the reference.
 	 *
 	 * @param {number} chapterNo - The number of the chapter in question
-	 * @return {bool} true if this reference is pointing at the given chapter; otherwise false
+	 * @return {boolean} true if this reference is pointing at the given chapter; otherwise false
 	 */
 	isChapterMatch(chapterNo) {
 		return this.chapterNo === chapterNo
@@ -136,7 +195,7 @@ class VerseLocation {
 	 *
 	 * @param {number} chapterNo - The number of the chapter in question
 	 * @param {number} verseNo   - The number of the verse in question
-	 * @return {bool} true if the given chapterNo and verseNo matches the location; otherwise false
+	 * @return {boolean} true if the given chapterNo and verseNo matches the location; otherwise false
 	 */
 	isVerseMatch(chapterNo, verseNo) {
 		return (this.chapterNo === chapterNo) && (this.verseNo == null || this.verseNo === verseNo)
@@ -150,12 +209,15 @@ class VerseLocation {
 	}
 
 	/**
-	 * Format the verse location in the given language.
+	 * Format the verse location.
 	 *
-	 * @param {Language} language - The language to use
-	 * @return {string}
+	 * @param {Library}       library - The library to use for loading format resources
+	 * @param {FormatOptions} opt     - An object with formatting options
+	 *
+	 * @return {string} The formatted verse location
 	 */
-	format(language) {
+	format(library, opt) {
+		const language = library.getLanguage(formatCfg(opt, 'language'))
 		const d = language.delimiters
 		return this.verseNo ? `${this.chapterNo}${d.chapterToVerse}${this.verseNo}` : `${this.chapterNo}`
 	}
@@ -189,7 +251,7 @@ class Reference extends VerseLocation {
 	/**
 	 * Checks whether the reference spans over more than one chapter
 	 *
-	 * @return {bool} true if the reference spans more than one chapter; otherwise false
+	 * @return {boolean} true if the reference spans more than one chapter; otherwise false
 	 */
 	multiChapter() {
 		return false
@@ -203,13 +265,17 @@ class Reference extends VerseLocation {
 	}
 
 	/**
-	 * Format the reference in the given language.
+	 * Format the reference.
 	 *
-	 * @param {Language} language - The language to use
-	 * @return {string} A short text representation of the reference
+	 * @param {Library}       library - The library to use for loading format resources
+	 * @param {FormatOptions} opt     - An object with formatting options
+	 *
+	 * @return {string} The formatted reference
 	 */
-	format(language) {
-		return `${this.bookName.format(language)} ${super.format(language)} ${this.translation.format(language)}`
+	format(library, opt) {
+		return this.bookName.format(library, opt) + ' ' +
+			super.format(library, opt) + ' ' +
+			this.translation.format(library, opt)
 	}
 }
 
@@ -240,7 +306,7 @@ class ReferenceRange {
 		 */
 		this.from = from
 		/**
-		 * @prop {VerseLocation|null} to - The location of the last chapter or verse, or null if the range is open
+		 * @prop {?VerseLocation} to - The location of the last chapter or verse, or null if the range is open
 		 */
 		this.to = to
 	}
@@ -248,7 +314,7 @@ class ReferenceRange {
 	/**
 	 * Checks whether the reference spans over more than one chapter
 	 *
-	 * @return {bool} true if the reference spans more than one chapter; otherwise false
+	 * @return {boolean} true if the reference spans more than one chapter; otherwise false
 	 */
 	multiChapter() {
 		if (this.to == null && this.from.verseNo == null) return true
@@ -259,7 +325,7 @@ class ReferenceRange {
 	 * Checks whether the chapterNo matches the reference.
 	 *
 	 * @param {number} chapterNo - The number of the chapter in question
-	 * @return {bool} true if this reference is pointing at the given chapter; otherwise false
+	 * @return {boolean} true if this reference is pointing at the given chapter; otherwise false
 	 */
 	isChapterMatch(chapterNo) {
 		return chapterNo >= this.from.chapterNo && (this.to == null || chapterNo <= this.to.chapterNo)
@@ -270,7 +336,7 @@ class ReferenceRange {
 	 *
 	 * @param {number} chapterNo - The number of the chapter in question
 	 * @param {number} verseNo   - The number of the verse in question
-	 * @return {bool} true if the given chapterNo and verseNo matches the reference; otherwise false
+	 * @return {boolean} true if the given chapterNo and verseNo matches the reference; otherwise false
 	 */
 	isVerseMatch(chapterNo, verseNo) {
 		if (chapterNo < this.from.chapterNo)
@@ -308,22 +374,25 @@ class ReferenceRange {
 	}
 
 	/**
-	 * Format the reference in the given language.
+	 * Format the reference range.
 	 *
-	 * @param {Language} language - The language to use
-	 * @return {string} A short text representation of the reference
+	 * @param {Library}       library - The library to use for loading format resources
+	 * @param {FormatOptions} opt     - An object with formatting options
+	 *
+	 * @return {string} The formatted reference range
 	 */
-	format(language) {
+	format(library, opt) {
+		const language = library.getLanguage(formatCfg(opt, 'language'))
 		const d = language.delimiters
 		let vr = null
 		if (this.to == null)
-			vr = `${this.from.format(language)}${d.andFollowing}`
+			vr = this.from.format(library, opt) + d.andFollowing
 		else if (this.from.chapterNo === this.to.chapterNo)
-			vr = `${this.from.chapterNo}${d.chapterToVerse}${this.from.verseNo}${d.verseRange}${this.to.verseNo}`
+			vr = this.from.chapterNo + d.chapterToVerse + this.from.verseNo + d.verseRange + this.to.verseNo
 		else
-			vr = `${this.from.format(language)} ${d.chapterRange} ${this.to.format(language)}`
+			vr = this.from.format(library, opt) + ' ' + d.chapterRange + ' ' + this.to.format(library, opt)
 
-		return `${this.bookName.format(language)} ${vr} ${this.translation.format(language)}`
+		return this.bookName.format(library, opt) + ' ' + vr + ' ' + this.translation.format(library, opt)
 	}
 }
 
@@ -347,11 +416,15 @@ class Verse {
 	}
 
 	/**
-	 * @param {Language} language - The language to use for formatting the reference
-	 * @return {string} The reference and the text of the verse
+	 * Format the verse with reference and text.
+	 *
+	 * @param {Library}       library - The library to use for loading format resources
+	 * @param {FormatOptions} opt     - An object with formatting options
+	 *
+	 * @return {string} The formatted reference and the text of the verse
 	 */
-	format(language) {
-		return `${this.reference.format(language)}: ${this.text}`
+	format(library, opt) {
+		return this.reference.format(library, opt) + ': ' + this.text
 	}
 }
 
@@ -361,7 +434,7 @@ class Verse {
 class Chapter {
 	/**
 	 * @param {Reference} reference - The reference to this chapter
-	 * @param {Vers[]}    verses    - The verses in this chapter
+	 * @param {Array.<Verse>}    verses    - The verses in this chapter
 	 */
 	constructor(reference, verses) {
 		/**
@@ -369,17 +442,23 @@ class Chapter {
 		 */
 		this.reference = reference
 		/**
-		 * @prop {Verse[]} verses - An array with all verses in this chapter
+		 * @prop {Array.<Verse>} verses - An array with all verses in this chapter
 		 */
 		this.verses = verses
 	}
 
 	/**
-	 * @param {Language} language - The language to use formatting the reference, defaults to the translations language
+	 * Format the chapter.
+	 *
+	 * @param {Library}       library - The library to use for loading format resources
+	 * @param {FormatOptions} opt     - An object with formatting options
+	 *
 	 * @return {string} A short description of the chapter
 	 */
-	format(language) {
-		return `${this.reference.format(language)} (${_.size(this.verses)} ${language.vocabulary.verses})`
+	format(library, opt) {
+		const language = library.getLanguage(formatCfg(opt, 'language'))
+		return this.reference.format(library, opt) + ' (' +
+			_.size(this.verses) + ' '  + language.vocabulary.verses + ')'
 	}
 }
 
@@ -388,9 +467,9 @@ class Chapter {
  */
 class Book {
 	/**
-	 * @param {Translation} translation - The bible translation this book is from
-	 * @param {BookName}    bookName    - The name of the bible book
-	 * @param {Chapter[]}   chapters    - The chapters in this book
+	 * @param {Translation}     translation - The bible translation this book is from
+	 * @param {BookName}        bookName    - The name of the bible book
+	 * @param {Array.<Chapter>} chapters    - The chapters in this book
 	 */
 	constructor(translation, bookName, chapters) {
 		/**
@@ -402,17 +481,23 @@ class Book {
 		 */
 		this.name = bookName
 		/**
-		 * @prop {Chapter[]} chapters - An array with all chapters in the book
+		 * @prop {Array.<Chapter>} chapters - An array with all chapters in the book
 		 */
 		this.chapters = chapters
 	}
 
 	/**
-	 * @param {Language} language - The language to use formatting the reference, defaults to the translations language
+	 * Format the bible book.
+	 *
+	 * @param {Library}       library - The library to use for loading format resources
+	 * @param {FormatOptions} opt     - An object with formatting options
+	 *
 	 * @return {string} A short description of the bible book
 	 */
-	format(language) {
-		return `${this.name.format(language)} ${this.translation.format(language)} (${_.size(this.chapters)} ${language.vocabulary.chapters})`
+	format(library, opt) {
+		return this.name.format(library, opt) + ' ' +
+			this.translation.format(library, opt) + ' ' +
+			_.size(this.chapters) + ' ' + language.vocabulary.chapters
 	}
 }
 
@@ -432,7 +517,7 @@ class BibleSource {
 	 * Returns all translations, the source can load.
 	 *
 	 * @abstract
-	 * @return {Translation[]} An array with the translations
+	 * @return {Array.<Translation>} An array with the translations
 	 */
 	getTranslations() {
 		throw new TypeError("The abstract method getTranslations is not implemented.")
@@ -443,7 +528,7 @@ class BibleSource {
 	 *
 	 * @abstract
 	 * @param {string} translationShortName - The short name of the translation
-	 * @return {bool} true if the translation is available in the source; otherwise false
+	 * @return {boolean} true if the translation is available in the source; otherwise false
 	 */
 	hasTranslation() {
 		throw new TypeError("The abstract method hasTranslation is not implemented.")
@@ -455,7 +540,7 @@ class BibleSource {
 	 * @abstract
 	 * @param {string} translationShortName - The short name of the translation
 	 * @param {string} bookId               - The technical ID of the book
-	 * @return {bool} true if the book is available in the source; otherwise false
+	 * @return {boolean} true if the book is available in the source; otherwise false
 	 */
 	hasBook() {
 		throw new TypeError("The abstract method hasBook is not implemented.")
@@ -504,7 +589,7 @@ class FunctionalBibleSource extends BibleSource {
 	/**
 	 * Returns all translations, the source can load.
 	 *
-	 * @return {Translation[]} An array with the translations
+	 * @return {Array.<Translation>} An array with the translations
 	 */
 	getTranslations() {
 		return this.getTranslationsFn()
@@ -514,7 +599,7 @@ class FunctionalBibleSource extends BibleSource {
 	 * Checks whether the source can load the given bible translation
 	 *
 	 * @param {string} translationShortName - The short name of the translation
-	 * @return {bool} true if the translation is available in the source; otherwise false
+	 * @return {boolean} true if the translation is available in the source; otherwise false
 	 */
 	hasTranslation(translationShortName) {
 		return this.hasTranslationFn(translationShortName)
@@ -525,7 +610,7 @@ class FunctionalBibleSource extends BibleSource {
 	 *
 	 * @param {string} translationShortName - The short name of the translation
 	 * @param {string} bookId               - The technical ID of the book
-	 * @return {bool} true if the book is available in the source; otherwise false
+	 * @return {boolean} true if the book is available in the source; otherwise false
 	 */
 	hasBook(translationShortName, bookId) {
 		return this.hasBookFn(translationShortName, bookId)
@@ -549,10 +634,10 @@ class FunctionalBibleSource extends BibleSource {
 class Language {
 
 	/**
-	 * @param {string} langTag    - The IETF tag of the language
-	 * @param {object} delimiters - A map of delimiter strings
-	 * @param {object} vocabulary - A map of word translations
-	 * @param {object} books      - A map of BookName objects, indexed by their short names
+	 * @param {string}                    langTag    - The IETF tag of the language
+	 * @param {Delimiters}                delimiters - A map of delimiter strings
+	 * @param {Vocabulary}                vocabulary - A map of word translations
+	 * @param {Object.<string, BookName>} books      - A map of BookName objects, indexed by their short names
 	 */
 	constructor(langTag, delimiters, vocabulary, books) {
 		this.langTag = langTag
@@ -576,7 +661,7 @@ class Library {
 		this.translations = {}
 		/**
 		 * An array with all registered bible sources
-		 * @type {BibleSource[]}
+		 * @type {Array.<BibleSource>}
 		 */
 		this.sources = []
 		this.defaults = {}
@@ -588,10 +673,10 @@ class Library {
 	/**
 	 * Register a language with its reference delimiters and book names.
 	 *
-	 * @param {string}   langTag    - The IETF language tag of the language.
-	 * @param {object}   delimiters - An object with the reference delimiters
-	 * @param {object}   vocabulary - An object with word translations
-	 * @param {Object[]} books      - An array of objects representing the books with the attributes `id`, `shortName`, and `name`
+	 * @param {string}     langTag    - The IETF language tag of the language.
+	 * @param {Delimiters} delimiters - An object with the reference delimiters
+	 * @param {Vocabulary} vocabulary - An object with word translations
+	 * @param {Array.<{id: string, shortName: string, name: string} >} - An array of objects representing the books with the attributes `id`, `shortName`, and `name`
 	 */
 	registerLanguage(langTag, delimiters, vocabulary, books) {
 		this.languages[langTag] = new Language(
@@ -632,7 +717,7 @@ class Library {
 	/**
 	 * Register a bible translation.
 	 *
-	 * @param {object} translation - An object with the attributes `shortName`, `name`, `langTag`
+	 * @param {{shortName: string, name: string, langTag: string}} translation - An object with the attributes `shortName`, `name`, `langTag`
 	 */
 	registerTranslation(translation) {
 		this.translations[translation.shortName] =
@@ -664,7 +749,7 @@ class Library {
 	 *
 	 * @param {string}  bookId  - The technical bible book ID
 	 * @param {string=} langTag - The IETF language tag
-	 * @return {BookName|null} The book name or `null` if the book is unknown in the given language
+	 * @return {?BookName} The book name or `null` if the book is unknown in the given language
 	 */
 	findBookName(bookId, langTag) {
 		const l = this.getLanguage(langTag)
@@ -676,7 +761,7 @@ class Library {
 	 * Finds a registered translation by its short name
 	 *
 	 * @param {string} shortName - The short name of the translation
-	 * @return {Translation|null} The translation object or null if the translation is unknown
+	 * @return {?Translation} The translation object or null if the translation is unknown
 	 */
 	findTranslation(shortName) {
 		return this.translations[shortName] || null
@@ -763,7 +848,7 @@ class Library {
 	/**
 	 * @param {Translation} translation
 	 * @param {BookName} bookName
-	 * @return {Book|null}
+	 * @return {?Book}
 	 */
 	loadBook(translation, bookName) {
 		if (translation == null) return null
@@ -777,7 +862,7 @@ class Library {
 	 * Load the referenced verses
 	 *
 	 * @param {Reference|ReferenceRange} reference - The reference to load the verses for
-	 * @return {Verse[]}
+	 * @return {Array.<Verse>}
 	 */
 	loadVerses(reference) {
 		const book = this.loadBook(
@@ -792,14 +877,16 @@ class Library {
 
 	/**
 	 * @param {Reference|ReferenceRange} reference - The reference, which was used to load the verses
-	 * @param {Verse[]}                  verses    - The verses to format
-	 * @param {string=}                  langTag   - The language to use for formatting as IETF tag
+	 * @param {Array.<Verse>}            verses    - The verses to format
+	 * @param {FormatOptions=}           opt       - An object with formatting options
 	 * @return {string} The verses as citation block in Pandoc-Markdown
 	 */
-	toMarkdown(reference, verses, langTag) {
+	toMarkdown(reference, verses, opt) {
 		if (_.isEmpty(verses)) return null
-		const l = this.getLanguage(langTag || verses[0].reference.translation.langTag)
+		const l = this.getLanguage(formatCfg(opt, 'language') || verses[0].reference.translation.langTag)
+		const vnl = formatCfg(opt, 'verseNewLine')
 		const lines = []
+		let firstContent = true
 		let cNo = _.size(_.groupBy(verses, v => v.reference.chapterNo)) > 1 ?
 			 null :
 			 verses[0].reference.chapterNo
@@ -807,31 +894,35 @@ class Library {
 			const r = v.reference
 			if (cNo !== r.chapterNo) {
 				cNo = r.chapterNo
+				if (!firstContent) lines.push('')
 				lines.push('**' + l.vocabulary.chapter + ' ' + cNo + '**')
 				lines.push('')
 			}
-			lines.push('^' + r.verseNo + '^ ' + v.text.trim())
+			lines.push('^' + r.verseNo + '^ ' + v.text.trim() + (vnl ? '  ' : ''))
+			firstContent = false
 		});
 		lines.push('')
-		lines.push('_' + reference.format(l) + '_')
+		lines.push('_' + reference.format(this, opt) + '_')
 		return _.join(_.map(lines, l => '> ' + l), os.EOL)
 	}
 
 	/**
 	 * @param {Reference|ReferenceRange} reference - The reference, which was used to load the verses
-	 * @param {Verse[]}                  verses    - The verses to format
-	 * @param {string=}                  langTag   - The language to use for formatting as IETF tag
-	 * @param {string=}                  cssClass  - The css class to apply to the outermost HTML element
+	 * @param {Array.<Verse>}            verses    - The verses to format
+	 * @param {FormatOptions=}           opt       - An object with formatting options
 	 * @return {string} The verses as citation block in HTML5
 	 */
-	toHTML(reference, verses, langTag, cssClass) {
+	toHTML(reference, verses, opt) {
 		if (_.isEmpty(verses)) return null
-		const l = this.getLanguage(langTag || verses[0].reference.translation.langTag)
+		const l = this.getLanguage(formatCfg(opt, 'language') || verses[0].reference.translation.langTag)
+		const vnl = formatCfg(opt, 'verseNewLine')
+		const cssClass = formatCfg(opt, 'cssClass')
 		const lines = []
 		let cNo = _.size(_.groupBy(verses, v => v.reference.chapterNo)) > 1 ?
 			null :
 			verses[0].reference.chapterNo
 		let firstContent = true
+		let firstVerse = true
 		if (cssClass) {
 			lines.push('<blockquote class="' + cssClass + '">')
 		} else {
@@ -842,35 +933,39 @@ class Library {
 			if (cNo !== r.chapterNo) {
 				cNo = r.chapterNo
 				if (!firstContent) lines.push('</p>')
-				lines.push('<p class="chapter-headline">')
+				lines.push('<p class="mdbible-chapter-headline">')
 				lines.push('<strong>' + l.vocabulary.chapter + ' ' + cNo + '</strong>')
 				lines.push('</p>')
 				if (!firstContent) lines.push('<p>')
+				firstVerse = true
 			}
 			if (firstContent) {
 				lines.push('<p>')
 				firstContent = false
 			}
-			lines.push('<sup>' + r.verseNo + '</sup>' + v.text.trim())
+			lines.push(((vnl && !firstVerse) ? '<br>' : '') +
+				'<sup>' + r.verseNo + '</sup>' + v.text.trim())
+			firstVerse = false
 		})
 		lines.push('</p>')
-		lines.push('<cite>' + reference.format(l) + '</cite>')
+		lines.push('<cite>' + reference.format(this, opt) + '</cite>')
 		lines.push('</blockquote>')
 		return _.join(lines, os.EOL)
 	}
 
 	/**
-	 * @param {Reference|ReferenceRange} reference        - The reference, which was used to load the verses
-	 * @param {Verse[]}                  verses           - The verses to format
-	 * @param {string=}                  langTag          - The language to use for formatting as IETF tag
-	 * @param {string=}                  quoteEnvironment - The LaTeX environment for the blockquote; defaults to `quote`
+	 * @param {Reference|ReferenceRange} reference - The reference, which was used to load the verses
+	 * @param {Array.<Verse>}            verses    - The verses to format
+	 * @param {FormatOptions=}           opt       - An object with formatting options
 	 * @return {string} The verses as citation block in LaTeX
 	 */
-	toLaTeX(reference, verses, langTag, quoteEnvironment) {
+	toLaTeX(reference, verses, opt) {
 		if (_.isEmpty(verses)) return null
-		const l = this.getLanguage(langTag || verses[0].reference.translation.langTag)
-		const env = quoteEnvironment || 'quote'
+		const l = this.getLanguage(formatCfg(opt, 'language') || verses[0].reference.translation.langTag)
+		const vnl = formatCfg(opt, 'verseNewLine')
+		const env = formatCfg(opt, 'texQuoteEnvironment')
 		const lines = []
+		let firstVerse = true
 		let cNo = _.size(_.groupBy(verses, v => v.reference.chapterNo)) > 1 ?
 			null :
 			verses[0].reference.chapterNo
@@ -881,12 +976,15 @@ class Library {
 				cNo = r.chapterNo
 				lines.push('\\textbf{' + l.vocabulary.chapter + ' ' + cNo + '}')
 				lines.push('')
+				firstVerse = true
 			}
-			lines.push('\\textsuperscript{' + r.verseNo + '}' + v.text.trim())
+			lines.push(((vnl && !firstVerse) ? '\\newline' : '') +
+				'\\textsuperscript{' + r.verseNo + '}' + v.text.trim())
+			firstVerse = false
 		})
 		lines.push('')
 		lines.push('\\begin{flushright}')
-		lines.push('\\emph{' + reference.format(l) + '}')
+		lines.push('\\emph{' + reference.format(this, opt) + '}')
 		lines.push('\\end{flushright}')
 		lines.push('\\end{' + env + '}')
 		return _.join(lines, os.EOL)

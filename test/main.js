@@ -5,6 +5,7 @@ const _ = require('lodash')
 const magnalex = require('../src/index.js')
 
 describe('MagnaLex', () => {
+
 	it('contains constructor functions for classes', () => {
 		assert(_.isFunction(magnalex.Library))
 		assert(_.isFunction(magnalex.Book))
@@ -15,15 +16,33 @@ describe('MagnaLex', () => {
 		assert(_.isFunction(magnalex.Reference))
 		assert(_.isFunction(magnalex.ReferenceRange))
 	})
-	it('should create default library', () => {
-		const lib = magnalex.library()
-		assert(lib, 'Library was not created.')
+
+	describe('library()', () => {
+		it('should create default library', () => {
+			const lib = magnalex.library()
+			assert(lib, 'Library was not created.')
+		})
+		it('should have one default source', () => {
+			const lib = magnalex.library()
+			assert.equal(_.size(lib.sources), 1)
+		})
 	})
-	it('should have one default source', () => {
-		const lib = magnalex.library()
-		assert.equal(_.size(lib.sources), 1)
+
+	describe('Library.getLanguage()', () => {
+		it('should return default language', () => {
+			const lib = magnalex.library()
+			const l = lib.getLanguage()
+			assert.equal(l.langTag, 'en')
+		})
+		it('should return changed default language', () => {
+			const lib = magnalex.library()
+			lib.setDefaultLanguage('de')
+			const l = lib.getLanguage()
+			assert.equal(l.langTag, 'de')
+		})
 	})
-	describe('reference parsing', () => {
+
+	describe('Library.parseReference()', () => {
 		it('should parse simple german reference', () => {
 			const lib = magnalex.library()
 			const r = lib.parseReference('Joh 3, 16 [LUT1912]', 'de')
@@ -49,7 +68,8 @@ describe('MagnaLex', () => {
 			assert.equal(r.verseNo, 16)
 		})
 	})
-	describe('library', () => {
+
+	describe('Library.findTranslation()', () => {
 		it('should have translation KJV', () => {
 			const lib = magnalex.library()
 			const bib = lib.findTranslation('KJV')
@@ -60,6 +80,9 @@ describe('MagnaLex', () => {
 			const bib = lib.findTranslation('LUT1912')
 			assert(bib)
 		})
+	})
+
+	describe('Library.loadVerses()', () => {
 		it('should load one verse from KJV', () => {
 			const lib = magnalex.library()
 			const ref = lib.parseReference('Joh 3:16 [KJV]', 'en')
