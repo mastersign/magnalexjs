@@ -1,5 +1,5 @@
 {
-  "name": "magnalex",
+  "name": "magnalexjs",
   "version": "0.1.0",
   "description": "Load Bible text in a structural fashion.",
   "main": "src/index.js",
