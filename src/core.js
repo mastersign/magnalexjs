@@ -6,6 +6,13 @@ const _ = require('lodash')
  * @type {Object}
  * @prop {string} bookBegin - A prefix before a book name
  * @prop {string} bookEnd - A suffix after a book name
+ * @prop {string} longBookBegin - A prefix before a full book name
+ * @prop {string} longBookEnd - A prefix after a full book name
+ * @prop {string} altBookSeparator - A binder between primary and alternative book name
+ * @prop {string} altBookBegin - A prefix before an alternative book name
+ * @prop {string} altBookEnd - A suffix after an alternative book name
+ * @prop {string} altLongBookBegin - A prefix before an alternative full book name
+ * @prop {string} altLongBookEnd - A prefix after an alternative full book name
  * @prop {string} chapterToVerse - The binder between a chapter number and the verse number(s)
  * @prop {string} chapterRange - The binder between the chapter numbers in a range
  * @prop {string} chapterList - The binder between enumerated chapter numbers
@@ -29,13 +36,16 @@ const _ = require('lodash')
 /**
  * @typedef FormatOptions
  * @type {Object}
- * @prop {string}  language            - The language to use for formatting as IETF tag
- * @prop {boolean} verseNewLine        - A switch to control whether every verse starts on its own line or not
- * @prop {boolean} fullBookName        - A switch to control whether the short or the full book name should be used
- * @prop {boolean} showTranslation     - A switch to control if the translation should be included in references
- * @prop {boolean} fullTranslationName - A switch to control whether the short ID or the full name of a bible translation should be used
- * @prop {string}  cssClass            - The CSS class to apply to the outermost HTML element
- * @prop {string}  texQuoteEnvironment - The TeX environment to use for block quotes
+ * @prop {string}  language               - The language to use for formatting as IETF tag
+ * @prop {boolean} verseNewLine           - A switch to control whether every verse starts on its own line or not
+ * @prop {boolean} fullBookName           - A switch to control whether the short or the full book name should be used
+ * @prop {boolean} useOriginalBookName    - A switch to control whether the original book name should be used
+ * @prop {boolean} translateBookName      - A switch to control whether a translated book name should be added
+ * @prop {boolean} showTranslation        - A switch to control if the translation should be included in references
+ * @prop {boolean} hideDefaultTranslation - A switch to control whether the translation is ommited, if it is the default translation
+ * @prop {boolean} fullTranslationName    - A switch to control whether the short ID or the full name of a bible translation should be used
+ * @prop {string}  cssClass               - The CSS class to apply to the outermost HTML element
+ * @prop {string}  texQuoteEnvironment    - The TeX environment to use for block quotes
  */
 
 const defaultFormat = {
@@ -43,6 +53,7 @@ const defaultFormat = {
 	verseNewLine: false,
 	fullBookName: false,
 	showTranslation: true,
+	hideDefaultTranslation: true,
 	fullTranslationName: false,
 	cssClass: 'mdbible',
 	texQuoteEnvironment: 'quote',
@@ -98,14 +109,24 @@ class BookName {
 	 *
 	 * @param {Library}       library - The library to use for loading format resources
 	 * @param {FormatOptions} opt     - An object with formatting options
+	 * @param {boolean=}      alt     - A switch to activate formatting for an alternative book name
 	 *
 	 * @return {string} The formatted name of the book
 	 */
-	format(library, opt) {
+	format(library, opt, alt) {
 		const language = library.getLanguage(formatCfg(opt, 'language'))
 		const d = language.delimiters
 		const fullBookName = formatCfg(opt, 'fullBookName')
-		return `${d.bookBegin}${fullBookName ? this.name : this.shortName}${d.bookEnd}`
+		if (alt)
+			if (fullBookName)
+				return d.altLongBookBegin + this.name + d.altLongBookEnd
+			else
+				return d.altBookBegin + this.shortName + d.altBookEnd
+		else
+			if (fullBookName)
+				return d.longBookBegin + this.name + d.longBookEnd
+			else
+				return d.bookBegin + this.shortName + d.bookEnd
 	}
 }
 
@@ -231,15 +252,15 @@ class VerseLocation {
 class Reference extends VerseLocation {
 
 	/**
-	 * @param {Translation} translation - The referenced bible translation
-	 * @param {BookName}    bookName    - The name of the bible book
-	 * @param {number}      chapterNo   - The number of the chapter (one-based)
-	 * @param {number}      verseNo     - The number of the verse (one-based)
+	 * @param {?Translation} translation - The referenced bible translation
+	 * @param {BookName}     bookName    - The name of the bible book
+	 * @param {number}       chapterNo   - The number of the chapter (one-based)
+	 * @param {number}       verseNo     - The number of the verse (one-based)
 	 */
 	constructor(translation, bookName, chapterNo, verseNo) {
 		super(chapterNo, verseNo)
 		/**
-		 * @prop {Translation} translation - The bible translation the reference is pointing at
+		 * @prop {?Translation} translation - The bible translation the reference is pointing at
 		 */
 		this.translation = translation
 		/**
@@ -273,9 +294,24 @@ class Reference extends VerseLocation {
 	 * @return {string} The formatted reference
 	 */
 	format(library, opt) {
-		return this.bookName.format(library, opt) + ' ' +
-			super.format(library, opt) + ' ' +
-			this.translation.format(library, opt)
+		const language = library.getLanguage(formatCfg(opt, 'language'))
+		const d = language.delimiters
+		const primaryBookName = opt.primaryBookName || this.bookName
+		const secondaryBookName = opt.secondaryBookName
+		
+		// book name(s)
+		let txt = primaryBookName.format(library, opt)
+		if (secondaryBookName)
+			txt += d.altBookSeparator + secondaryBookName.format(library, opt, true)
+		
+		// verse location
+		txt += ' ' + super.format(library, opt)
+		
+		// translation
+		if (formatCfg(opt, 'showTranslation'))
+			txt += ' ' + this.translation.format(library, opt)
+		
+		return txt
 	}
 }
 
@@ -287,7 +323,7 @@ class Reference extends VerseLocation {
 class ReferenceRange {
 
 	/**
-	 * @param {Translation}   translation - The referenced bible translation
+	 * @param {?Translation}  translation - The referenced bible translation
 	 * @param {BookName}      bookName    - The name of the bible book
 	 * @param {VerseLocation} from        - The location of the first verse in the range
 	 * @param {VerseLocation} to          - The location of the last verse in the range, or null if the range is open
@@ -384,15 +420,27 @@ class ReferenceRange {
 	format(library, opt) {
 		const language = library.getLanguage(formatCfg(opt, 'language'))
 		const d = language.delimiters
-		let vr = null
+		const primaryBookName = opt.primaryBookName || this.bookName
+		const secondaryBookName = opt.secondaryBookName
+	
+		// book name(s)
+		let txt = primaryBookName.format(library, opt)
+		if (secondaryBookName) txt += d.altBookSeparator + secondaryBookName.format(library, opt, true)
+		
+		// verse location
+		txt += ' '
 		if (this.to == null)
-			vr = this.from.format(library, opt) + d.andFollowing
+			txt += this.from.format(library, opt) + d.andFollowing
 		else if (this.from.chapterNo === this.to.chapterNo)
-			vr = this.from.chapterNo + d.chapterToVerse + this.from.verseNo + d.verseRange + this.to.verseNo
+			txt += this.from.chapterNo + d.chapterToVerse + this.from.verseNo + d.verseRange + this.to.verseNo
 		else
-			vr = this.from.format(library, opt) + ' ' + d.chapterRange + ' ' + this.to.format(library, opt)
+			txt += this.from.format(library, opt) + ' ' + d.chapterRange + ' ' + this.to.format(library, opt)
 
-		return this.bookName.format(library, opt) + ' ' + vr + ' ' + this.translation.format(library, opt)
+		// translation
+		if (formatCfg(opt, 'showTranslation'))
+			txt += ' ' + this.translation.format(library, opt)
+
+		return txt
 	}
 }
 
@@ -758,13 +806,24 @@ class Library {
 	}
 
 	/**
-	 * Finds a registered translation by its short name
+	 * Gets a registered translation by its short name
 	 *
 	 * @param {string} shortName - The short name of the translation
 	 * @return {?Translation} The translation object or null if the translation is unknown
 	 */
-	findTranslation(shortName) {
+	getTranslation(shortName) {
 		return this.translations[shortName] || null
+	}
+
+	/**
+	 * Finds a registered translation by its short name.
+	 * Returns the default translation if `shortName` is `null` or the given short name is unknown.
+	 *
+	 * @param {?string} shortName - The short name of the translation
+	 * @return {Translation} The translation object or null if the translation is unknown
+	 */
+	findTranslation(shortName) {
+		return this.translations[shortName] || this.translations[this.defaults.translation]
 	}
 
 	/**
@@ -782,7 +841,7 @@ class Library {
 		let m = patterns.chapter.exec(s)
 		if (m) {
 			return new Reference(
-				this.findTranslation(m[4] || this.defaults.translation),
+				this.getTranslation(m[4]),
 				books[m[1]],
 				parseInt(m[2]),
 				null
@@ -791,7 +850,7 @@ class Library {
 		m = patterns.chapterAndFollowing.exec(s)
 		if (m) {
 			return new ReferenceRange(
-				this.findTranslation(m[3] || this.defaults.translation),
+				this.getTranslation(m[3]),
 				books[m[1]],
 				new VerseLocation(parseInt(m[2]), null),
 				null
@@ -800,7 +859,7 @@ class Library {
 		m = patterns.chapterRange.exec(s)
 		if (m) {
 			return new ReferenceRange(
-				this.findTranslation(m[4] || this.defaults.translation),
+				this.getTranslation(m[4]),
 				books[m[1]],
 				new VerseLocation(parseInt(m[2]), null),
 				new VerseLocation(parseInt(m[3]), null)
@@ -809,7 +868,7 @@ class Library {
 		m = patterns.verse.exec(s)
 		if (m) {
 			return new Reference(
-				this.findTranslation(m[4] || this.defaults.translation),
+				this.getTranslation(m[4]),
 				books[m[1]],
 				parseInt(m[2]),
 				parseInt(m[3])
@@ -818,7 +877,7 @@ class Library {
 		m = patterns.verseAndFollowing.exec(s)
 		if (m) {
 			return new ReferenceRange(
-				this.findTranslation(m[4] || this.defaults.translation),
+				this.getTranslation(m[4]),
 				books[m[1]],
 				new VerseLocation(parseInt(m[2]), parseInt(m[3])),
 				null
@@ -827,7 +886,7 @@ class Library {
 		m = patterns.verseRange.exec(s)
 		if (m) {
 			return new ReferenceRange(
-				this.findTranslation(m[5] || this.defaults.translation),
+				this.getTranslation(m[5]),
 				books[m[1]],
 				new VerseLocation(parseInt(m[2]), parseInt(m[3])),
 				new VerseLocation(parseInt(m[2]), parseInt(m[4]))
@@ -836,7 +895,7 @@ class Library {
 		m = patterns.range.exec(s)
 		if (m) {
 			return new ReferenceRange(
-				this.findTranslation(m[6] || this.defaults.translation),
+				this.getTranslation(m[6]),
 				books[m[1]],
 				new VerseLocation(parseInt(m[2]), parseInt(m[3])),
 				new VerseLocation(parseInt(m[4]), parseInt(m[5]))
@@ -859,20 +918,53 @@ class Library {
 	}
 
 	/**
-	 * Load the referenced verses
+	 * Load the referenced verses.
+	 * Returns `null` if the referenced translation and the default translation could not be found.
 	 *
 	 * @param {Reference|ReferenceRange} reference - The reference to load the verses for
-	 * @return {Array.<Verse>}
+	 * @return {?Array.<Verse>}
 	 */
 	loadVerses(reference) {
-		const book = this.loadBook(
-			this.findTranslation(reference.translation.shortName),
-			this.findBookName(reference.bookName.id, reference.translation.langTag))
+		const refTranslation = reference.translation ?
+			reference.translation.shortName	:
+			null
+		const translation = this.findTranslation(refTranslation)
+		if (!translation) {
+			return null
+		}
+		const book = this.loadBook(translation,
+			this.findBookName(reference.bookName.id, translation.langTag))
 		if (book == null) return null
 		const chapters = _.filter(book.chapters, c => reference.isChapterMatch(c.reference.chapterNo))
 		return _.filter(
 			_.flatten(_.map(chapters, c => c.verses)),
 			v => reference.isVerseMatch(v.reference.chapterNo, v.reference.verseNo))
+	}
+
+	/**
+	 * Creates tailored formatting options for formatting a reference as part of a quote
+	 * @private
+	 * @param {Reference|ReferenceRange} ref   - The requested reference
+	 * @param {Reference}                exRef - An examplary reference from the loaded verses
+	 * @param {Language}                 lang  - The language to use for formatting
+	 * @param {FormatOptions=}           opt   - The formatting options from the caller
+	 */
+	setupQuoteSourceOptions(ref, exRef, lang, opt) {
+		return {
+			language: formatCfg(opt, 'language'),
+			showTranslation: formatCfg(opt, 'showTranslation') &&
+				(!formatCfg(opt, 'hideDefaultTranslation') || 
+				 ref.translation.shortName !== exRef.translation.shortName),
+			primaryBookName: formatCfg(opt, 'useOriginalBookName') ?
+				exRef.bookName : this.findBookName(exRef.bookName.id, lang.langTag),
+			secondaryBookName: exRef.bookName.langTag !== lang.langTag && formatCfg(opt, 'translateBookName') ?
+				(formatCfg(opt, 'useOriginalBookName') ?
+					this.findBookName(exRef.bookName.id, lang.langTag) :
+					exRef.bookName) :
+				null,
+			fullBookName: formatCfg(opt, 'fullBookName'),
+			fullTranslationName: formatCfg(opt, 'fullTranslationName'),
+		}
 	}
 
 	/**
@@ -883,13 +975,16 @@ class Library {
 	 */
 	toMarkdown(reference, verses, opt) {
 		if (_.isEmpty(verses)) return null
-		const l = this.getLanguage(formatCfg(opt, 'language') || verses[0].reference.translation.langTag)
+		const exampleVerse = verses[0]
+		const exampleReference = exampleVerse.reference
+		const l = this.getLanguage(formatCfg(opt, 'language') || exampleReference.translation.langTag)
+		const quoteSrcOpt = this.setupQuoteSourceOptions(reference, exampleReference, l, opt)
 		const vnl = formatCfg(opt, 'verseNewLine')
 		const lines = []
 		let firstContent = true
 		let cNo = _.size(_.groupBy(verses, v => v.reference.chapterNo)) > 1 ?
 			 null :
-			 verses[0].reference.chapterNo
+			 exampleReference.chapterNo
 		_.forEach(verses, function (v) {
 			const r = v.reference
 			if (cNo !== r.chapterNo) {
@@ -902,7 +997,7 @@ class Library {
 			firstContent = false
 		});
 		lines.push('')
-		lines.push('_' + reference.format(this, opt) + '_')
+		lines.push('_' + reference.format(this, quoteSrcOpt) + '_')
 		return _.join(_.map(lines, l => '> ' + l), os.EOL)
 	}
 
@@ -914,13 +1009,16 @@ class Library {
 	 */
 	toHTML(reference, verses, opt) {
 		if (_.isEmpty(verses)) return null
-		const l = this.getLanguage(formatCfg(opt, 'language') || verses[0].reference.translation.langTag)
+		const exampleVerse = verses[0]
+		const exampleReference = exampleVerse.reference
+		const l = this.getLanguage(formatCfg(opt, 'language') || exampleReference.translation.langTag)
+		const quoteSrcOpt = this.setupQuoteSourceOptions(reference, exampleReference, l, opt)
 		const vnl = formatCfg(opt, 'verseNewLine')
 		const cssClass = formatCfg(opt, 'cssClass')
 		const lines = []
 		let cNo = _.size(_.groupBy(verses, v => v.reference.chapterNo)) > 1 ?
 			null :
-			verses[0].reference.chapterNo
+			exampleReference.chapterNo
 		let firstContent = true
 		let firstVerse = true
 		if (cssClass) {
@@ -948,7 +1046,7 @@ class Library {
 			firstVerse = false
 		})
 		lines.push('</p>')
-		lines.push('<cite>' + reference.format(this, opt) + '</cite>')
+		lines.push('<cite>' + reference.format(this, quoteSrcOpt) + '</cite>')
 		lines.push('</blockquote>')
 		return _.join(lines, os.EOL)
 	}
@@ -961,14 +1059,17 @@ class Library {
 	 */
 	toLaTeX(reference, verses, opt) {
 		if (_.isEmpty(verses)) return null
-		const l = this.getLanguage(formatCfg(opt, 'language') || verses[0].reference.translation.langTag)
+		const exampleVerse = verses[0]
+		const exampleReference = exampleVerse.reference
+		const l = this.getLanguage(formatCfg(opt, 'language') || exampleReference.translation.langTag)
+		const quoteSrcOpt = this.setupQuoteSourceOptions(reference, exampleReference, l, opt)
 		const vnl = formatCfg(opt, 'verseNewLine')
 		const env = formatCfg(opt, 'texQuoteEnvironment')
 		const lines = []
 		let firstVerse = true
 		let cNo = _.size(_.groupBy(verses, v => v.reference.chapterNo)) > 1 ?
 			null :
-			verses[0].reference.chapterNo
+			exampleReference.chapterNo
 		lines.push('\\begin{' + env + '}')
 		_.forEach(verses, function (v) {
 			const r = v.reference
@@ -984,7 +1085,7 @@ class Library {
 		})
 		lines.push('')
 		lines.push('\\begin{flushright}')
-		lines.push('\\emph{' + reference.format(this, opt) + '}')
+		lines.push('\\emph{' + reference.format(this, quoteSrcOpt) + '}')
 		lines.push('\\end{flushright}')
 		lines.push('\\end{' + env + '}')
 		return _.join(lines, os.EOL)
