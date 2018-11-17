@@ -2,6 +2,13 @@
   "delimiters": {
     "bookBegin": "",
     "bookEnd": "",
+    "longBookBegin": "",
+    "longBookEnd": "",
+    "altBookSeparator": " ",
+    "altBookBegin": "(",
+    "altBookEnd": ")",
+    "altLongBookBegin": "(",
+    "altLongBookEnd": ")",
     "chapterToVerse": ":",
     "chapterRange": "-",
     "chapterList": ",",
