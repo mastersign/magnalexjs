@@ -284,7 +284,9 @@ class Reference extends VerseLocation {
 	 * @return {string} A text representation of the reference
 	 */
 	toString() {
-		return `${this.bookName} ${super.toString()} ${this.translation}`
+		return this.translation ?
+			`${this.bookName} ${super.toString()} ${this.translation}` :
+			`${this.bookName} ${super.toString()}`
 	}
 
 	/**
@@ -408,7 +410,9 @@ class ReferenceRange {
 		else
 			vr = `${this.from} - ${this.to}`
 
-		return `${this.bookName} ${vr} ${this.translation}`
+		return this.translation ?
+			`${this.bookName} ${vr} ${this.translation}` :
+			`${this.bookName} ${vr}`
 	}
 
 	/**
@@ -439,7 +443,7 @@ class ReferenceRange {
 			txt += this.from.format(library, opt) + ' ' + d.chapterRange + ' ' + this.to.format(library, opt)
 
 		// translation
-		if (formatCfg(opt, 'showTranslation'))
+		if (formatCfg(opt, 'showTranslation') && this.translation)
 			txt += ' ' + this.translation.format(library, opt)
 
 		return txt
@@ -955,7 +959,7 @@ class Library {
 		return {
 			language: formatCfg(opt, 'language'),
 			showTranslation: formatCfg(opt, 'showTranslation') &&
-				(!formatCfg(opt, 'hideDefaultTranslation') || 
+				(!formatCfg(opt, 'hideDefaultTranslation') ||
 				 ref.translation.shortName !== exRef.translation.shortName),
 			primaryBookName: formatCfg(opt, 'useOriginalBookName') ?
 				exRef.bookName : this.findBookName(exRef.bookName.id, lang.langTag),
