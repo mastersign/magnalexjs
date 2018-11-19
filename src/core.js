@@ -300,19 +300,19 @@ class Reference extends VerseLocation {
 		const d = language.delimiters
 		const primaryBookName = opt.primaryBookName || this.bookName
 		const secondaryBookName = opt.secondaryBookName
-		
+
 		// book name(s)
 		let txt = primaryBookName.format(library, opt)
 		if (secondaryBookName)
 			txt += d.altBookSeparator + secondaryBookName.format(library, opt, true)
-		
+
 		// verse location
 		txt += ' ' + super.format(library, opt)
-		
+
 		// translation
-		if (formatCfg(opt, 'showTranslation'))
+		if (formatCfg(opt, 'showTranslation') && this.translation)
 			txt += ' ' + this.translation.format(library, opt)
-		
+
 		return txt
 	}
 }
@@ -424,11 +424,11 @@ class ReferenceRange {
 		const d = language.delimiters
 		const primaryBookName = opt.primaryBookName || this.bookName
 		const secondaryBookName = opt.secondaryBookName
-	
+
 		// book name(s)
 		let txt = primaryBookName.format(library, opt)
 		if (secondaryBookName) txt += d.altBookSeparator + secondaryBookName.format(library, opt, true)
-		
+
 		// verse location
 		txt += ' '
 		if (this.to == null)
