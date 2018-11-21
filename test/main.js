@@ -169,25 +169,6 @@ describe('MagnaLex', () => {
 		let refWTde = null
 		const bns = { 'en': 'Gen', 'de': '1. Mo' }
 
-		function checkOptBookName(actualOpt, expectedPrimaryLangTag, expectedSecondaryLangTag) {
-			if (expectedPrimaryLangTag) {
-				assert.strictEqual(actualOpt.primaryBookName.langTag, expectedPrimaryLangTag,
-					'Language of primary book name does not match.')
-				assert.strictEqual(actualOpt.primaryBookName.shortName, bns[expectedPrimaryLangTag],
-					'Short name of primary book name does not match.')
-			} else {
-				assert.ok(!actualOpt.primaryBookName, 'Primary book name is set.')
-			}
-			if (expectedSecondaryLangTag) {
-				assert.strictEqual(actualOpt.secondaryBookName.langTag, expectedSecondaryLangTag,
-					'Language of secondary book name does not match.')
-				assert.strictEqual(actualOpt.secondaryBookName.shortName, bns[expectedSecondaryLangTag],
-					'Short name of secondary book name does not match.')
-			} else {
-				assert.ok(!actualOpt.secondaryBookName, 'Secondary book name is set.')
-			}
-		}
-
 		beforeEach(() => {
 			lib = magnalex.library()
 			refKJV = new magnalex.Reference(lib.getTranslation('KJV'), lib.findBookName('1Mo', 'en'), 1, 1)
@@ -196,95 +177,85 @@ describe('MagnaLex', () => {
 			refWTde = new magnalex.Reference(null, lib.findBookName('1Mo', 'de'), 1, 1)
 		})
 
-		it('should use english book name by default', () => {
-			const expected = 'en'
-			let resultOpt
+		function checkOptBookNames(actualOpt, expectedPrimaryLangTag, expectedSecondaryLangTag, msg) {
+			if (expectedPrimaryLangTag) {
+				assert.strictEqual(actualOpt.primaryBookName.langTag, expectedPrimaryLangTag,
+					'Language of primary book name does not match. ' + msg)
+				assert.strictEqual(actualOpt.primaryBookName.shortName, bns[expectedPrimaryLangTag],
+					'Short name of primary book name does not match. ' + msg)
+			} else {
+				assert.ok(!actualOpt.primaryBookName, 'Primary book name is set. ' + msg)
+			}
+			if (expectedSecondaryLangTag) {
+				assert.strictEqual(actualOpt.secondaryBookName.langTag, expectedSecondaryLangTag,
+					'Language of secondary book name does not match. ' + msg)
+				assert.strictEqual(actualOpt.secondaryBookName.shortName, bns[expectedSecondaryLangTag],
+					'Short name of secondary book name does not match. ' + msg)
+			} else {
+				assert.ok(!actualOpt.secondaryBookName, 'Secondary book name is set. ' + msg)
+			}
+		}
 
-			resultOpt = lib.setupQuoteSourceOptions(refWTen, null, null, {})
-			checkOptBookName(resultOpt, expected, null)
+		function check(expectedPrimaryLangTag, expectedSecondaryLangTag, ref, exRef, opt, msg) {
+			checkOptBookNames(
+				lib.setupQuoteSourceOptions(ref, exRef, opt),
+				expectedPrimaryLangTag, expectedSecondaryLangTag, msg)
+		}
 
-			resultOpt = lib.setupQuoteSourceOptions(refWTde, null, null, {})
-			checkOptBookName(resultOpt, expected, null)
+		describe('without example reference', () => {
+
+			it('should use english book name by default', () => {
+				check('en', null, refWTen, null, {}, 'from english')
+				check('en', null, refWTde, null, {}, 'from german')
+				check('en', null, refKJV, null, {}, 'from KJV')
+				check('en', null, refLUT, null, {}, 'from LUT')
+			})
+
+			it('should use book name in format language by default', () => {
+				check('de', null, refWTen, null, { language: 'de' }, 'from english, german format')
+				check('de', null, refWTde, null, { language: 'de' }, 'from german, german format')
+				check('de', null, refKJV, null, { language: 'de' }, 'from KJV, german format')
+				check('de', null, refLUT, null, { language: 'de' }, 'from LUT, german format')
+			})
+
+			describe('with default translation', () => {
+
+				it('should use book name from default translation by default', () => {
+					lib.setDefaultTranslation('LUT1912')
+					check('de', null, refWTen, null, { language: 'en' }, 'from english, english format')
+					check('de', null, refWTde, null, { language: 'en' }, 'from german, english format')
+					check('de', null, refKJV, null, { language: 'en' }, 'from KJV, english format')
+					check('de', null, refLUT, null, { language: 'en' }, 'from LUT, english format')
+				})
+
+				it('should use book name in format language by option', () => {
+					lib.setDefaultTranslation('LUT1912')
+					check('en', null, refWTen, null, { useOriginalBookName: false, language: 'en' }, 'from english')
+					check('en', null, refWTde, null, { useOriginalBookName: false, language: 'en' }, 'from german')
+					check('en', null, refKJV, null, { useOriginalBookName: false, language: 'en' }, 'from KJV')
+					check('en', null, refLUT, null, { useOriginalBookName: false, language: 'en' }, 'from LUT')
+				})
+
+			})
+
 		})
 
-		it('should use book name in format language by default', () => {
-			const expected = 'de'
-			let resultOpt
+		describe('with example reference', () => {
 
-			resultOpt = lib.setupQuoteSourceOptions(refWTen, null, null, { language: 'de' })
-			checkOptBookName(resultOpt, expected, null)
+			it('should use original book name by default', () => {
+				check('de', null, refWTen, refLUT, { }, 'from english, for LUT, no format lang')
+				check('de', null, refWTde, refLUT, { }, 'from german, for LUT, no format lang')
+				check('de', null, refWTen, refLUT, { language: 'en' }, 'from english, for LUT, english format')
+				check('de', null, refWTde, refLUT, { language: 'en' }, 'from german, for LUT, english format')
+			})
 
-			resultOpt = lib.setupQuoteSourceOptions(refWTen, null, null, { language: 'de' })
-			checkOptBookName(resultOpt, expected, null)
+			it('should use translated book name by option', () => {
+				check('en', null, refWTen, refLUT, { useOriginalBookName: false }, 'from english, for LUT, no format')
+				check('en', null, refWTde, refLUT, { useOriginalBookName: false }, 'from german, no format')
+				check('de', null, refWTde, refLUT, { useOriginalBookName: false, language: 'de' }, 'from german, german format')
+				check('de', null, refWTde, refKJV, { useOriginalBookName: false, language: 'de' }, 'from german, english format')
+			})
+
 		})
-
-		it('should use english book name without example reference', () => {
-			const expected = 'en'
-			let resultOpt
-
-			resultOpt = lib.setupQuoteSourceOptions(refKJV, null, null, {})
-			checkOptBookName(resultOpt, expected, null)
-
-			resultOpt = lib.setupQuoteSourceOptions(refLUT, null, null, {})
-			checkOptBookName(resultOpt, expected, null)
-		})
-
-		it('should use book name in format language without example reference', () => {
-			const expected = 'de'
-			let resultOpt
-
-			resultOpt = lib.setupQuoteSourceOptions(refKJV, null, null, { language: 'de' })
-			checkOptBookName(resultOpt, expected, null)
-
-			resultOpt = lib.setupQuoteSourceOptions(refLUT, null, null, { language: 'de' })
-			checkOptBookName(resultOpt, expected, null)
-		})
-
-		it('should use book name from default translation without example reference', () => {
-			lib.setDefaultTranslation('LUT1912')
-			const expected = 'de'
-			let resultOpt
-
-			resultOpt = lib.setupQuoteSourceOptions(refKJV, null, null, { language: 'en' })
-			checkOptBookName(resultOpt, expected, null)
-
-			resultOpt = lib.setupQuoteSourceOptions(refLUT, null, null, { language: 'en' })
-			checkOptBookName(resultOpt, expected, null)
-		})
-
-		it('should use original book name with example reference', () => {
-			const expected = 'de'
-			let resultOpt = null
-
-			resultOpt = lib.setupQuoteSourceOptions(refWTen, refLUT, null, { })
-			checkOptBookName(resultOpt, expected, null)
-
-			resultOpt = lib.setupQuoteSourceOptions(refWTde, refLUT, null, { })
-			checkOptBookName(resultOpt, expected, null)
-
-			resultOpt = lib.setupQuoteSourceOptions(refWTen, refLUT, null, { language: 'en' })
-			checkOptBookName(resultOpt, expected, null)
-
-			resultOpt = lib.setupQuoteSourceOptions(refWTde, refLUT, null, { language: 'en' })
-			checkOptBookName(resultOpt, expected, null)
-		})
-
-		it('should use translated book name with example reference', () => {
-			const expected = 'de'
-			let resultOpt = null
-
-			resultOpt = lib.setupQuoteSourceOptions(refWTen, refLUT, null, { })
-			checkOptBookName(resultOpt, expected, null)
-
-			resultOpt = lib.setupQuoteSourceOptions(refWTde, refLUT, null, { })
-			checkOptBookName(resultOpt, expected, null)
-
-			resultOpt = lib.setupQuoteSourceOptions(refWTen, refLUT, null, { language: 'en' })
-			checkOptBookName(resultOpt, expected, null)
-
-			resultOpt = lib.setupQuoteSourceOptions(refWTde, refLUT, null, { language: 'en' })
-			checkOptBookName(resultOpt, expected, null)
-		})
-
 	})
 })
