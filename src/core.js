@@ -49,7 +49,7 @@ const _ = require('lodash')
  */
 
 const defaultFormat = {
-	language: null,
+	language: 'en',
 	verseNewLine: false,
 	fullBookName: false,
 	useOriginalBookName: true,
