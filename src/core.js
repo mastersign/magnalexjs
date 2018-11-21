@@ -949,22 +949,19 @@ class Library {
 
 	/**
 	 * Creates tailored formatting options for formatting a reference as part of a quote
-	 * @private
+	 *
 	 * @param {Reference|ReferenceRange} ref   - The requested reference
 	 * @param {?Reference}               exRef - An examplary reference from the loaded verses
-	 * @param {?Language}                lang  - The language to use for formatting
 	 * @param {FormatOptions=}           opt   - The formatting options from the caller
 	 */
-	setupQuoteSourceOptions(ref, exRef, lang, opt) {
+	setupQuoteSourceOptions(ref, exRef, opt) {
 		if (!exRef) {
 			const defTranslation = this.getTranslation(this.defaults.translation)
 			const exRefLangTag = defTranslation ? defTranslation.langTag : formatCfg(opt, 'language')
 			const bookName = this.findBookName(ref.bookName.id, exRefLangTag)
 			exRef = new Reference(defTranslation, bookName, 1, 1)
 		}
-		if (!lang) {
-			lang = this.getLanguage(formatCfg(opt, 'language') || exRef.translation.langTag)
-		}
+		const lang = this.getLanguage(formatCfg(opt, 'language') || exRef.translation.langTag)
 		return {
 			language: formatCfg(opt, 'language'),
 			showTranslation: formatCfg(opt, 'showTranslation') &&
@@ -992,8 +989,8 @@ class Library {
 		if (_.isEmpty(verses)) return null
 		const exampleVerse = verses[0]
 		const exampleReference = exampleVerse.reference
+		const quoteSrcOpt = this.setupQuoteSourceOptions(reference, exampleReference, opt)
 		const l = this.getLanguage(formatCfg(opt, 'language') || exampleReference.translation.langTag)
-		const quoteSrcOpt = this.setupQuoteSourceOptions(reference, exampleReference, l, opt)
 		const vnl = formatCfg(opt, 'verseNewLine')
 		const lines = []
 		let firstContent = true
@@ -1027,7 +1024,7 @@ class Library {
 		const exampleVerse = verses[0]
 		const exampleReference = exampleVerse.reference
 		const l = this.getLanguage(formatCfg(opt, 'language') || exampleReference.translation.langTag)
-		const quoteSrcOpt = this.setupQuoteSourceOptions(reference, exampleReference, l, opt)
+		const quoteSrcOpt = this.setupQuoteSourceOptions(reference, exampleReference, opt)
 		const vnl = formatCfg(opt, 'verseNewLine')
 		const cssClass = formatCfg(opt, 'cssClass')
 		const lines = []
@@ -1077,7 +1074,7 @@ class Library {
 		const exampleVerse = verses[0]
 		const exampleReference = exampleVerse.reference
 		const l = this.getLanguage(formatCfg(opt, 'language') || exampleReference.translation.langTag)
-		const quoteSrcOpt = this.setupQuoteSourceOptions(reference, exampleReference, l, opt)
+		const quoteSrcOpt = this.setupQuoteSourceOptions(reference, exampleReference, opt)
 		const vnl = formatCfg(opt, 'verseNewLine')
 		const env = formatCfg(opt, 'texQuoteEnvironment')
 		const lines = []
