@@ -951,11 +951,20 @@ class Library {
 	 * Creates tailored formatting options for formatting a reference as part of a quote
 	 * @private
 	 * @param {Reference|ReferenceRange} ref   - The requested reference
-	 * @param {Reference}                exRef - An examplary reference from the loaded verses
-	 * @param {Language}                 lang  - The language to use for formatting
+	 * @param {?Reference}               exRef - An examplary reference from the loaded verses
+	 * @param {?Language}                lang  - The language to use for formatting
 	 * @param {FormatOptions=}           opt   - The formatting options from the caller
 	 */
 	setupQuoteSourceOptions(ref, exRef, lang, opt) {
+		if (!exRef) {
+			const defTranslation = this.getTranslation(this.defaults.translation)
+			const exRefLangTag = defTranslation ? defTranslation.langTag : formatCfg(opt, 'language')
+			const bookName = this.findBookName(ref.bookName.id, exRefLangTag)
+			exRef = new Reference(defTranslation, bookName, 1, 1)
+		}
+		if (!lang) {
+			lang = this.getLanguage(formatCfg(opt, 'language') || exRef.translation.langTag)
+		}
 		return {
 			language: formatCfg(opt, 'language'),
 			showTranslation: formatCfg(opt, 'showTranslation') &&
