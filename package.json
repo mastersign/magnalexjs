@@ -22,6 +22,7 @@
     "xmldom": "^0.1.27"
   },
   "devDependencies": {
+    "del": "^3.0.0",
     "mocha": "^5.2.0",
     "xmlbible-kjv": "^1.0.0",
     "xmlbible-lut1912": "^1.0.0"
