@@ -771,6 +771,15 @@ class Library {
 	}
 
 	/**
+	 * Gets the default language object or `null` if no default language was set.
+	 *
+	 * @returns {?Language} The default language object.
+	 */
+	getDefaultLanguage() {
+		return this.languages[this.defaults.langTag]
+	}
+
+	/**
 	 * Finds a language description by its IETF tag.
 	 * If no language tag is given, the default language is returned.
 	 *
@@ -798,6 +807,15 @@ class Library {
 	 */
 	setDefaultTranslation(translation) {
 		this.defaults.translation = translation
+	}
+
+	/**
+	 * Gets the default translation object or `null` if no default translation was set.
+	 *
+	 * @returns {?Translation} The default translation object.
+	 */
+	getDefaultTranslation() {
+		return this.translations[this.defaults.translation]
 	}
 
 	/**
