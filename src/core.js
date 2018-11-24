@@ -775,6 +775,7 @@ class Library {
 	 * If no language tag is given, the default language is returned.
 	 *
 	 * @param {string=} langTag - The IETF language tag
+	 * @returns {Language} A language object
 	 */
 	getLanguage(langTag) {
 		return this.languages[langTag || this.defaults.langTag]
