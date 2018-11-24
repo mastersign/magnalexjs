@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Class: VerseLocation</title>
+    <title>JSDoc: Class: ReferenceRange</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Class: VerseLocation</h1>
+    <h1 class="page-title">Class: ReferenceRange</h1>
 
     
 
@@ -28,9 +28,10 @@
 
 <header>
     
-        <h2><span class="attribs"><span class="type-signature"></span></span>VerseLocation<span class="signature">(chapterNo, verseNo<span class="signature-attributes">nullable</span>)</span><span class="type-signature"></span></h2>
+        <h2><span class="attribs"><span class="type-signature"></span></span>ReferenceRange<span class="signature">(translation<span class="signature-attributes">nullable</span>, bookName, from, to)</span><span class="type-signature"></span></h2>
         
-            <div class="class-description"><p>The location of a verse without the context of a bible book.</p></div>
+            <div class="class-description"><p>The reference to a range of verses in a bible translation.</p>
+<p>A range of verses can only span over verses in one bible book.</p></div>
         
     
 </header>
@@ -45,7 +46,7 @@
     
 
     
-    <h4 class="name" id="VerseLocation"><span class="type-signature"></span>new VerseLocation<span class="signature">(chapterNo, verseNo<span class="signature-attributes">nullable</span>)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="ReferenceRange"><span class="type-signature"></span>new ReferenceRange<span class="signature">(translation<span class="signature-attributes">nullable</span>, bookName, from, to)</span><span class="type-signature"></span></h4>
     
 
     
@@ -87,44 +88,13 @@
 
         <tr>
             
-                <td class="name"><code>chapterNo</code></td>
+                <td class="name"><code>translation</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">number</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last"><p>The number of the chapter (one-based)</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>verseNo</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
+<span class="param-type"><a href="Translation.html">Translation</a></span>
 
 
             
@@ -144,7 +114,100 @@
 
             
 
-            <td class="description last"><p>The number of the verse (one-based), or null if he whole chapter is referenced</p></td>
+            <td class="description last"><p>The referenced bible translation</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>bookName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="BookName.html">BookName</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>The name of the bible book</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>from</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="VerseLocation.html">VerseLocation</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>The location of the first verse in the range</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>to</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="VerseLocation.html">VerseLocation</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>The location of the last verse in the range, or null if the range is open</p></td>
         </tr>
 
     
@@ -185,7 +248,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="core.js.html">core.js</a>, <a href="core.js.html#line189">line 189</a>
+        <a href="core.js.html">core.js</a>, <a href="core.js.html#line328">line 328</a>
     </li></ul></dd>
     
 
@@ -233,7 +296,7 @@
 
         
             
-<h4 class="name" id="chapterNo"><span class="type-signature"></span>chapterNo<span class="type-signature"></span></h4>
+<h4 class="name" id="bookName"><span class="type-signature"></span>bookName<span class="type-signature"></span></h4>
 
 
 
@@ -270,13 +333,13 @@
 
         <tr>
             
-                <td class="name"><code>chapterNo</code></td>
+                <td class="name"><code>bookName</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">number</span>
+<span class="param-type"><a href="BookName.html">BookName</a></span>
 
 
             
@@ -286,7 +349,7 @@
 
             
 
-            <td class="description last"><p>The number of the chapter (one-based)</p></td>
+            <td class="description last"><p>The bible book this reference is pointing at</p></td>
         </tr>
 
     
@@ -325,7 +388,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="core.js.html">core.js</a>, <a href="core.js.html#line199">line 199</a>
+        <a href="core.js.html">core.js</a>, <a href="core.js.html#line344">line 344</a>
     </li></ul></dd>
     
 
@@ -343,7 +406,117 @@
 
         
             
-<h4 class="name" id="verseNo"><span class="type-signature"></span>verseNo<span class="type-signature"></span></h4>
+<h4 class="name" id="from"><span class="type-signature"></span>from<span class="type-signature"></span></h4>
+
+
+
+
+
+
+
+
+
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>from</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="VerseLocation.html">VerseLocation</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The location of the first chapter or verse</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="core.js.html">core.js</a>, <a href="core.js.html#line348">line 348</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="to"><span class="type-signature"></span>to<span class="type-signature"></span></h4>
 
 
 
@@ -382,13 +555,13 @@
 
         <tr>
             
-                <td class="name"><code>verseNo</code></td>
+                <td class="name"><code>to</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">number</span>
+<span class="param-type"><a href="VerseLocation.html">VerseLocation</a></span>
 
 
             
@@ -406,7 +579,7 @@
 
             
 
-            <td class="description last"><p>The number of the verse (one-based), or null if he whole chapter is referenced</p></td>
+            <td class="description last"><p>The location of the last chapter or verse, or null if the range is open</p></td>
         </tr>
 
     
@@ -445,7 +618,117 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="core.js.html">core.js</a>, <a href="core.js.html#line203">line 203</a>
+        <a href="core.js.html">core.js</a>, <a href="core.js.html#line352">line 352</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="translation"><span class="type-signature"></span>translation<span class="type-signature"></span></h4>
+
+
+
+
+
+
+
+
+
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>translation</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="Translation.html">Translation</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The bible translation the reference is pointing at</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="core.js.html">core.js</a>, <a href="core.js.html#line340">line 340</a>
     </li></ul></dd>
     
 
@@ -481,7 +764,7 @@
 
 
 <div class="description">
-    <p>Format the verse location.</p>
+    <p>Format the reference range.</p>
 </div>
 
 
@@ -597,7 +880,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="core.js.html">core.js</a>, <a href="core.js.html#line242">line 242</a>
+        <a href="core.js.html">core.js</a>, <a href="core.js.html#line427">line 427</a>
     </li></ul></dd>
     
 
@@ -624,7 +907,7 @@
 
         
 <div class="param-desc">
-    <p>The formatted verse location</p>
+    <p>The formatted reference range</p>
 </div>
 
 
@@ -754,7 +1037,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="core.js.html">core.js</a>, <a href="core.js.html#line212">line 212</a>
+        <a href="core.js.html">core.js</a>, <a href="core.js.html#line371">line 371</a>
     </li></ul></dd>
     
 
@@ -818,7 +1101,7 @@
 
 
 <div class="description">
-    <p>Checks whether the given chapterNo and verseNo matches the verse location.</p>
+    <p>Checks whether the given chapterNo and verseNo matches the reference.</p>
 </div>
 
 
@@ -934,7 +1217,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="core.js.html">core.js</a>, <a href="core.js.html#line223">line 223</a>
+        <a href="core.js.html">core.js</a>, <a href="core.js.html#line382">line 382</a>
     </li></ul></dd>
     
 
@@ -961,7 +1244,115 @@
 
         
 <div class="param-desc">
-    <p>true if the given chapterNo and verseNo matches the location; otherwise false</p>
+    <p>true if the given chapterNo and verseNo matches the reference; otherwise false</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">boolean</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="multiChapter"><span class="type-signature"></span>multiChapter<span class="signature">()</span><span class="type-signature"> &rarr; {boolean}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Checks whether the reference spans over more than one chapter</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="core.js.html">core.js</a>, <a href="core.js.html#line360">line 360</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>true if the reference spans more than one chapter; otherwise false</p>
 </div>
 
 
@@ -1038,7 +1429,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="core.js.html">core.js</a>, <a href="core.js.html#line230">line 230</a>
+        <a href="core.js.html">core.js</a>, <a href="core.js.html#line405">line 405</a>
     </li></ul></dd>
     
 
@@ -1065,7 +1456,7 @@
 
         
 <div class="param-desc">
-    <p>The verse location in one string</p>
+    <p>A text representation of this reference range</p>
 </div>
 
 
@@ -1110,7 +1501,7 @@
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sat Nov 24 2018 11:36:56 GMT+0100 (Mitteleuropäische Zeit)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sat Nov 24 2018 12:08:53 GMT+0100 (Mitteleuropäische Zeit)
 </footer>
 
 <script> prettyPrint(); </script>

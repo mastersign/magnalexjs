@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Class: Book</title>
+    <title>JSDoc: Class: Chapter</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Class: Book</h1>
+    <h1 class="page-title">Class: Chapter</h1>
 
     
 
@@ -28,9 +28,9 @@
 
 <header>
     
-        <h2><span class="attribs"><span class="type-signature"></span></span>Book<span class="signature">(translation, bookName, chapters)</span><span class="type-signature"></span></h2>
+        <h2><span class="attribs"><span class="type-signature"></span></span>Chapter<span class="signature">(reference, verses)</span><span class="type-signature"></span></h2>
         
-            <div class="class-description"><p>A bible book.</p></div>
+            <div class="class-description"><p>A bible chapter.</p></div>
         
     
 </header>
@@ -45,7 +45,7 @@
     
 
     
-    <h4 class="name" id="Book"><span class="type-signature"></span>new Book<span class="signature">(translation, bookName, chapters)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="Chapter"><span class="type-signature"></span>new Chapter<span class="signature">(reference, verses)</span><span class="type-signature"></span></h4>
     
 
     
@@ -85,13 +85,13 @@
 
         <tr>
             
-                <td class="name"><code>translation</code></td>
+                <td class="name"><code>reference</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type"><a href="Translation.html">Translation</a></span>
+<span class="param-type"><a href="Reference.html">Reference</a></span>
 
 
             
@@ -101,20 +101,20 @@
 
             
 
-            <td class="description last"><p>The bible translation this book is from</p></td>
+            <td class="description last"><p>The reference to this chapter</p></td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>bookName</code></td>
+                <td class="name"><code>verses</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type"><a href="BookName.html">BookName</a></span>
+<span class="param-type">Array.&lt;<a href="Verse.html">Verse</a>></span>
 
 
             
@@ -124,30 +124,7 @@
 
             
 
-            <td class="description last"><p>The name of the bible book</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>chapters</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Array.&lt;<a href="Chapter.html">Chapter</a>></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The chapters in this book</p></td>
+            <td class="description last"><p>The verses in this chapter</p></td>
         </tr>
 
     
@@ -188,7 +165,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="core.js.html">core.js</a>, <a href="core.js.html#line525">line 525</a>
+        <a href="core.js.html">core.js</a>, <a href="core.js.html#line491">line 491</a>
     </li></ul></dd>
     
 
@@ -236,7 +213,7 @@
 
         
             
-<h4 class="name" id="chapters"><span class="type-signature"></span>chapters<span class="type-signature"></span></h4>
+<h4 class="name" id="reference"><span class="type-signature"></span>reference<span class="type-signature"></span></h4>
 
 
 
@@ -273,13 +250,13 @@
 
         <tr>
             
-                <td class="name"><code>chapters</code></td>
+                <td class="name"><code>reference</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Array.&lt;<a href="Chapter.html">Chapter</a>></span>
+<span class="param-type"><a href="Reference.html">Reference</a></span>
 
 
             
@@ -289,7 +266,7 @@
 
             
 
-            <td class="description last"><p>An array with all chapters in the book</p></td>
+            <td class="description last"><p>A reference to this chapter</p></td>
         </tr>
 
     
@@ -328,7 +305,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="core.js.html">core.js</a>, <a href="core.js.html#line543">line 543</a>
+        <a href="core.js.html">core.js</a>, <a href="core.js.html#line500">line 500</a>
     </li></ul></dd>
     
 
@@ -346,7 +323,7 @@
 
         
             
-<h4 class="name" id="name"><span class="type-signature"></span>name<span class="type-signature"></span></h4>
+<h4 class="name" id="verses"><span class="type-signature"></span>verses<span class="type-signature"></span></h4>
 
 
 
@@ -383,13 +360,13 @@
 
         <tr>
             
-                <td class="name"><code>name</code></td>
+                <td class="name"><code>verses</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type"><a href="BookName.html">BookName</a></span>
+<span class="param-type">Array.&lt;<a href="Verse.html">Verse</a>></span>
 
 
             
@@ -399,7 +376,7 @@
 
             
 
-            <td class="description last"><p>The name of the bible book</p></td>
+            <td class="description last"><p>An array with all verses in this chapter</p></td>
         </tr>
 
     
@@ -438,117 +415,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="core.js.html">core.js</a>, <a href="core.js.html#line539">line 539</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-        
-            
-<h4 class="name" id="translation"><span class="type-signature"></span>translation<span class="type-signature"></span></h4>
-
-
-
-
-
-
-
-
-
-
-    <h5 class="subsection-title">Properties:</h5>
-
-    
-
-<table class="props">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>translation</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="Translation.html">Translation</a></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The bible translation, the books belongs to</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="core.js.html">core.js</a>, <a href="core.js.html#line535">line 535</a>
+        <a href="core.js.html">core.js</a>, <a href="core.js.html#line504">line 504</a>
     </li></ul></dd>
     
 
@@ -584,7 +451,7 @@
 
 
 <div class="description">
-    <p>Format the bible book.</p>
+    <p>Format the chapter.</p>
 </div>
 
 
@@ -700,7 +567,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="core.js.html">core.js</a>, <a href="core.js.html#line554">line 554</a>
+        <a href="core.js.html">core.js</a>, <a href="core.js.html#line515">line 515</a>
     </li></ul></dd>
     
 
@@ -727,7 +594,7 @@
 
         
 <div class="param-desc">
-    <p>A short description of the bible book</p>
+    <p>A short description of the chapter</p>
 </div>
 
 
@@ -772,7 +639,7 @@
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sat Nov 24 2018 11:36:56 GMT+0100 (Mitteleuropäische Zeit)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sat Nov 24 2018 12:08:53 GMT+0100 (Mitteleuropäische Zeit)
 </footer>
 
 <script> prettyPrint(); </script>
