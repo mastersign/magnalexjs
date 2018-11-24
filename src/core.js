@@ -304,9 +304,10 @@ class Reference extends VerseLocation {
 		const secondaryBookName = opt.secondaryBookName
 
 		// book name(s)
-		let txt = primaryBookName.format(library, opt)
-		if (secondaryBookName)
-			txt += d.altBookSeparator + secondaryBookName.format(library, opt, true)
+		const primaryBookTxt = primaryBookName.format(library, opt)
+		let txt = secondaryBookName && secondaryBookName.format(library, opt) !== primaryBookTxt ?
+			primaryBookTxt + d.altBookSeparator + secondaryBookName.format(library, opt, true) :
+			primaryBookTxt
 
 		// verse location
 		txt += ' ' + super.format(library, opt)
@@ -430,8 +431,10 @@ class ReferenceRange {
 		const secondaryBookName = opt.secondaryBookName
 
 		// book name(s)
-		let txt = primaryBookName.format(library, opt)
-		if (secondaryBookName) txt += d.altBookSeparator + secondaryBookName.format(library, opt, true)
+		const primaryBookTxt = primaryBookName.format(library, opt)
+		let txt = secondaryBookName && secondaryBookName.format(library, opt) !== primaryBookTxt ?
+			primaryBookTxt + d.altBookSeparator + secondaryBookName.format(library, opt, true) :
+			primaryBookTxt
 
 		// verse location
 		txt += ' '
