@@ -249,7 +249,7 @@ describe('MagnaLex.Library', () => {
 					check('de', 'en', refLUT, null, { translateBookName: true, language: 'en' }, 'from LUT, translate, en format')
 				})
 
-				it('should translate book name from from format language by option', () => {
+				it('should translate book name from format language by option', () => {
 					lib.setDefaultTranslation('LUT1912')
 					check('en', 'de', refWTen, null, { useOriginalBookName: false, translateBookName: true, language: 'en' }, 'from en, no orginal, translate, en format')
 					check('en', 'de', refWTde, null, { useOriginalBookName: false, translateBookName: true, language: 'en' }, 'from de, no orginal, translate, en format')
