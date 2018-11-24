@@ -93,3 +93,184 @@ describe('MagnaLex.Library', () => {
 	})
 
 })
+
+describe('MagnaLex.Reference', () => {
+
+	describe('format()', () => {
+
+		let lib = null
+
+		beforeEach(() => {
+			lib = magnalex.library()
+		})
+
+		it('should use reference book name by default', () => {
+			const trl = lib.getTranslation('KJV')
+			const bn = lib.findBookName('1Mo', 'en')
+			const ref = new magnalex.Reference(trl, bn, 12, 23)
+			const expected = 'Gen 12:23 [KJV]'
+			const actual = ref.format(lib, { })
+			assert.strictEqual(actual, expected, 'did not use reference book name')
+		})
+
+		it('should use primary book name', () => {
+			const trl = lib.getTranslation('KJV')
+			const bn = lib.findBookName('1Mo', 'en')
+			const bn1 = new magnalex.BookName('Gen', 'XYZ', 'XxYyZz', 'en')
+			const ref = new magnalex.Reference(trl, bn, 12, 23)
+			const expected = 'XYZ 12:23 [KJV]'
+			const actual = ref.format(lib, { primaryBookName: bn1 })
+			assert.strictEqual(actual, expected, 'did not use primary book name')
+		})
+
+		it('should use full primary book name by option', () => {
+			const trl = lib.getTranslation('KJV')
+			const bn = lib.findBookName('1Mo', 'en')
+			const bn1 = new magnalex.BookName('Gen', 'XYZ', 'XxYyZz', 'en')
+			const ref = new magnalex.Reference(trl, bn, 12, 23)
+			const expected = 'XxYyZz 12:23 [KJV]'
+			const actual = ref.format(lib, { primaryBookName: bn1, fullBookName: true })
+			assert.strictEqual(actual, expected, 'did not use full primary book name')
+		})
+
+		it('should use primary and secondary book name', () => {
+			const trl = lib.getTranslation('KJV')
+			const bn = lib.findBookName('1Mo', 'en')
+			const bn1 = new magnalex.BookName('Gen', 'XYZ', 'XxYyZz', 'en')
+			const bn2 = new magnalex.BookName('Gen', 'ABC', 'AaBbCc', 'de')
+			const ref = new magnalex.Reference(trl, bn, 12, 23)
+			const expected = 'XYZ (ABC) 12:23 [KJV]'
+			const actual = ref.format(lib, { primaryBookName: bn1, secondaryBookName: bn2 })
+			assert.strictEqual(actual, expected, 'did not use primary and seoncdary book name')
+		})
+
+		it('should use full primary and secondary book name by option', () => {
+			const trl = lib.getTranslation('KJV')
+			const bn = lib.findBookName('1Mo', 'en')
+			const bn1 = new magnalex.BookName('Gen', 'XYZ', 'XxYyZz', 'en')
+			const bn2 = new magnalex.BookName('Gen', 'ABC', 'AaBbCc', 'de')
+			const ref = new magnalex.Reference(trl, bn, 12, 23)
+			const expected = 'XxYyZz (AaBbCc) 12:23 [KJV]'
+			const actual = ref.format(lib, { primaryBookName: bn1, secondaryBookName: bn2, fullBookName: true })
+			assert.strictEqual(actual, expected, 'did not use full primary and seoncdary book name')
+		})
+
+		it('should ommit secondary book name if it equals the primary one', () => {
+			const trl = lib.getTranslation('KJV')
+			const bn = lib.findBookName('1Mo', 'en')
+			const bn1 = new magnalex.BookName('Gen', 'XYZ', 'XxYyZz', 'en')
+			const bn2 = new magnalex.BookName('Gen', 'XYZ', 'AaBbCc', 'de')
+			const ref = new magnalex.Reference(trl, bn, 12, 23)
+			const expected = 'XYZ 12:23 [KJV]'
+			const actual = ref.format(lib, { primaryBookName: bn1, secondaryBookName: bn2 })
+			assert.strictEqual(actual, expected, 'did use secondary book name despite its beeing equal to the primary')
+		})
+
+		it('should ommit full secondary book name if it equals the primary one', () => {
+			const trl = lib.getTranslation('KJV')
+			const bn = lib.findBookName('1Mo', 'en')
+			const bn1 = new magnalex.BookName('Gen', 'XYZ', 'XxYyZz', 'en')
+			const bn2 = new magnalex.BookName('Gen', 'ABC', 'XxYyZz', 'de')
+			const ref = new magnalex.Reference(trl, bn, 12, 23)
+			const expected = 'XxYyZz 12:23 [KJV]'
+			const actual = ref.format(lib, { primaryBookName: bn1, secondaryBookName: bn2, fullBookName: true })
+			assert.strictEqual(actual, expected, 'did use full secondary book name despite its beeing equal to the primary')
+		})
+
+	})
+
+})
+
+describe('MagnaLex.ReferenceRange', () => {
+
+	describe('ReferenceRange.format()', () => {
+
+		let lib = null
+
+		beforeEach(() => {
+			lib = magnalex.library()
+		})
+
+		it('should use reference book name by default', () => {
+			const trl = lib.getTranslation('KJV')
+			const bn = lib.findBookName('1Mo', 'en')
+			const ref = new magnalex.ReferenceRange(trl, bn,
+				new magnalex.VerseLocation(1, 2), new magnalex.VerseLocation(2, 3))
+			const expected = 'Gen 1:2 - 2:3 [KJV]'
+			const actual = ref.format(lib, { })
+			assert.strictEqual(actual, expected, 'did not use reference book name')
+		})
+
+		it('should use primary book name', () => {
+			const trl = lib.getTranslation('KJV')
+			const bn = lib.findBookName('1Mo', 'en')
+			const bn1 = new magnalex.BookName('Gen', 'XYZ', 'XxYyZz', 'en')
+			const ref = new magnalex.ReferenceRange(trl, bn,
+				new magnalex.VerseLocation(1, 2), new magnalex.VerseLocation(2, 3))
+			const expected = 'XYZ 1:2 - 2:3 [KJV]'
+			const actual = ref.format(lib, { primaryBookName: bn1 })
+			assert.strictEqual(actual, expected, 'did not use primary book name')
+		})
+
+		it('should use full primary book name by option', () => {
+			const trl = lib.getTranslation('KJV')
+			const bn = lib.findBookName('1Mo', 'en')
+			const bn1 = new magnalex.BookName('Gen', 'XYZ', 'XxYyZz', 'en')
+			const ref = new magnalex.ReferenceRange(trl, bn,
+				new magnalex.VerseLocation(1, 2), new magnalex.VerseLocation(2, 3))
+			const expected = 'XxYyZz 1:2 - 2:3 [KJV]'
+			const actual = ref.format(lib, { primaryBookName: bn1, fullBookName: true })
+			assert.strictEqual(actual, expected, 'did not use full primary book name')
+		})
+
+		it('should use primary and secondary book name', () => {
+			const trl = lib.getTranslation('KJV')
+			const bn = lib.findBookName('1Mo', 'en')
+			const bn1 = new magnalex.BookName('Gen', 'XYZ', 'XxYyZz', 'en')
+			const bn2 = new magnalex.BookName('Gen', 'ABC', 'AaBbCc', 'de')
+			const ref = new magnalex.ReferenceRange(trl, bn,
+				new magnalex.VerseLocation(1, 2), new magnalex.VerseLocation(2, 3))
+			const expected = 'XYZ (ABC) 1:2 - 2:3 [KJV]'
+			const actual = ref.format(lib, { primaryBookName: bn1, secondaryBookName: bn2 })
+			assert.strictEqual(actual, expected, 'did not use primary and seoncdary book name')
+		})
+
+		it('should use full primary and secondary book name by option', () => {
+			const trl = lib.getTranslation('KJV')
+			const bn = lib.findBookName('1Mo', 'en')
+			const bn1 = new magnalex.BookName('Gen', 'XYZ', 'XxYyZz', 'en')
+			const bn2 = new magnalex.BookName('Gen', 'ABC', 'AaBbCc', 'de')
+			const ref = new magnalex.ReferenceRange(trl, bn,
+				new magnalex.VerseLocation(1, 2), new magnalex.VerseLocation(2, 3))
+			const expected = 'XxYyZz (AaBbCc) 1:2 - 2:3 [KJV]'
+			const actual = ref.format(lib, { primaryBookName: bn1, secondaryBookName: bn2, fullBookName: true })
+			assert.strictEqual(actual, expected, 'did not use full primary and seoncdary book name')
+		})
+
+		it('should ommit secondary book name if it equals the primary one', () => {
+			const trl = lib.getTranslation('KJV')
+			const bn = lib.findBookName('1Mo', 'en')
+			const bn1 = new magnalex.BookName('Gen', 'XYZ', 'XxYyZz', 'en')
+			const bn2 = new magnalex.BookName('Gen', 'XYZ', 'AaBbCc', 'de')
+			const ref = new magnalex.ReferenceRange(trl, bn,
+				new magnalex.VerseLocation(1, 2), new magnalex.VerseLocation(2, 3))
+			const expected = 'XYZ 1:2 - 2:3 [KJV]'
+			const actual = ref.format(lib, { primaryBookName: bn1, secondaryBookName: bn2 })
+			assert.strictEqual(actual, expected, 'did use secondary book name despite its beeing equal to the primary')
+		})
+
+		it('should ommit full secondary book name if it equals the primary one', () => {
+			const trl = lib.getTranslation('KJV')
+			const bn = lib.findBookName('1Mo', 'en')
+			const bn1 = new magnalex.BookName('Gen', 'XYZ', 'XxYyZz', 'en')
+			const bn2 = new magnalex.BookName('Gen', 'ABC', 'XxYyZz', 'de')
+			const ref = new magnalex.ReferenceRange(trl, bn,
+				new magnalex.VerseLocation(1, 2), new magnalex.VerseLocation(2, 3))
+			const expected = 'XxYyZz 1:2 - 2:3 [KJV]'
+			const actual = ref.format(lib, { primaryBookName: bn1, secondaryBookName: bn2, fullBookName: true })
+			assert.strictEqual(actual, expected, 'did use full secondary book name despite its beeing equal to the primary')
+		})
+
+	})
+
+})

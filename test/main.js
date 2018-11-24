@@ -1,4 +1,5 @@
 /** globals describe, it */
+/* jshint trailingcomma: false */
 
 const assert = require('assert')
 const _ = require('lodash')
@@ -28,7 +29,11 @@ describe('MagnaLex', () => {
 		})
 	})
 
-	describe('Library.getLanguage()', () => {
+})
+
+describe('MagnaLex.Library', () => {
+
+	describe('getLanguage()', () => {
 		it('should return default language', () => {
 			const lib = magnalex.library()
 			const l = lib.getLanguage()
@@ -42,7 +47,7 @@ describe('MagnaLex', () => {
 		})
 	})
 
-	describe('Library.parseReference()', () => {
+	describe('parseReference()', () => {
 		it('should parse simple german reference', () => {
 			const lib = magnalex.library()
 			const r = lib.parseReference('Joh 3, 16 [LUT1912]', 'de')
@@ -91,7 +96,7 @@ describe('MagnaLex', () => {
 		})
 	})
 
-	describe('Library.findTranslation()', () => {
+	describe('findTranslation()', () => {
 		it('should have translation KJV', () => {
 			const lib = magnalex.library()
 			const bib = lib.getTranslation('KJV')
@@ -104,7 +109,7 @@ describe('MagnaLex', () => {
 		})
 	})
 
-	describe('Library.loadVerses()', () => {
+	describe('loadVerses()', () => {
 		it('should load one verse from KJV', () => {
 			const lib = magnalex.library()
 			const ref = lib.parseReference('Joh 3:16 [KJV]', 'en')
@@ -160,7 +165,7 @@ describe('MagnaLex', () => {
 
 	})
 
-	describe('Library.setupQuoteSourceOptions()', () => {
+	describe('setupQuoteSourceOptions()', () => {
 
 		let lib = null
 		let refKJV = null
@@ -205,35 +210,51 @@ describe('MagnaLex', () => {
 		describe('without example reference', () => {
 
 			it('should use english book name by default', () => {
-				check('en', null, refWTen, null, {}, 'from english')
-				check('en', null, refWTde, null, {}, 'from german')
+				check('en', null, refWTen, null, {}, 'from en')
+				check('en', null, refWTde, null, {}, 'from de')
 				check('en', null, refKJV, null, {}, 'from KJV')
 				check('en', null, refLUT, null, {}, 'from LUT')
 			})
 
 			it('should use book name in format language by default', () => {
-				check('de', null, refWTen, null, { language: 'de' }, 'from english, german format')
-				check('de', null, refWTde, null, { language: 'de' }, 'from german, german format')
-				check('de', null, refKJV, null, { language: 'de' }, 'from KJV, german format')
-				check('de', null, refLUT, null, { language: 'de' }, 'from LUT, german format')
+				check('de', null, refWTen, null, { language: 'de' }, 'from en, de format')
+				check('de', null, refWTde, null, { language: 'de' }, 'from de, de format')
+				check('de', null, refKJV, null, { language: 'de' }, 'from KJV, de format')
+				check('de', null, refLUT, null, { language: 'de' }, 'from LUT, de format')
 			})
 
 			describe('with default translation', () => {
 
 				it('should use book name from default translation by default', () => {
 					lib.setDefaultTranslation('LUT1912')
-					check('de', null, refWTen, null, { language: 'en' }, 'from english, english format')
-					check('de', null, refWTde, null, { language: 'en' }, 'from german, english format')
-					check('de', null, refKJV, null, { language: 'en' }, 'from KJV, english format')
-					check('de', null, refLUT, null, { language: 'en' }, 'from LUT, english format')
+					check('de', null, refWTen, null, { language: 'en' }, 'from en, en format')
+					check('de', null, refWTde, null, { language: 'en' }, 'from de, en format')
+					check('de', null, refKJV, null, { language: 'en' }, 'from KJV, en format')
+					check('de', null, refLUT, null, { language: 'en' }, 'from LUT, en format')
 				})
 
 				it('should use book name in format language by option', () => {
 					lib.setDefaultTranslation('LUT1912')
-					check('en', null, refWTen, null, { useOriginalBookName: false, language: 'en' }, 'from english')
-					check('en', null, refWTde, null, { useOriginalBookName: false, language: 'en' }, 'from german')
-					check('en', null, refKJV, null, { useOriginalBookName: false, language: 'en' }, 'from KJV')
-					check('en', null, refLUT, null, { useOriginalBookName: false, language: 'en' }, 'from LUT')
+					check('en', null, refWTen, null, { useOriginalBookName: false, language: 'en' }, 'from en, no original, en format')
+					check('en', null, refWTde, null, { useOriginalBookName: false, language: 'en' }, 'from de, no original, en format')
+					check('en', null, refKJV, null, { useOriginalBookName: false, language: 'en' }, 'from KJV, no original, en format')
+					check('en', null, refLUT, null, { useOriginalBookName: false, language: 'en' }, 'from LUT, no original, en format')
+				})
+
+				it('should translate book name from default translation by option', () => {
+					lib.setDefaultTranslation('LUT1912')
+					check('de', 'en', refWTen, null, { translateBookName: true, language: 'en' }, 'from en, translate, en format')
+					check('de', 'en', refWTde, null, { translateBookName: true, language: 'en' }, 'from de, translate, en format')
+					check('de', 'en', refKJV, null, { translateBookName: true, language: 'en' }, 'from KJV, translate, en format')
+					check('de', 'en', refLUT, null, { translateBookName: true, language: 'en' }, 'from LUT, translate, en format')
+				})
+
+				it('should translate book name from from format language by option', () => {
+					lib.setDefaultTranslation('LUT1912')
+					check('en', 'de', refWTen, null, { useOriginalBookName: false, translateBookName: true, language: 'en' }, 'from en, no orginal, translate, en format')
+					check('en', 'de', refWTde, null, { useOriginalBookName: false, translateBookName: true, language: 'en' }, 'from de, no orginal, translate, en format')
+					check('en', 'de', refKJV, null, { useOriginalBookName: false, translateBookName: true, language: 'en' }, 'from KJV, no orginal, translate, en format')
+					check('en', 'de', refLUT, null, { useOriginalBookName: false, translateBookName: true, language: 'en' }, 'from LUT, no orginal, translate, en format')
 				})
 
 			})
@@ -243,19 +264,39 @@ describe('MagnaLex', () => {
 		describe('with example reference', () => {
 
 			it('should use original book name by default', () => {
-				check('de', null, refWTen, refLUT, { }, 'from english, for LUT, no format lang')
-				check('de', null, refWTde, refLUT, { }, 'from german, for LUT, no format lang')
-				check('de', null, refWTen, refLUT, { language: 'en' }, 'from english, for LUT, english format')
-				check('de', null, refWTde, refLUT, { language: 'en' }, 'from german, for LUT, english format')
+				check('de', null, refWTen, refLUT, { }, 'from en, for LUT, no format lang')
+				check('de', null, refWTde, refLUT, { }, 'from de, for LUT, no format lang')
+				check('de', null, refWTen, refLUT, { language: 'en' }, 'from en, for LUT, en format')
+				check('de', null, refWTde, refLUT, { language: 'en' }, 'from de, for LUT, en format')
 			})
 
 			it('should use translated book name by option', () => {
-				check('en', null, refWTen, refLUT, { useOriginalBookName: false }, 'from english, for LUT, no format')
-				check('en', null, refWTde, refLUT, { useOriginalBookName: false }, 'from german, no format')
-				check('de', null, refWTde, refLUT, { useOriginalBookName: false, language: 'de' }, 'from german, german format')
-				check('de', null, refWTde, refKJV, { useOriginalBookName: false, language: 'de' }, 'from german, english format')
+				check('en', null, refWTen, refLUT, { useOriginalBookName: false }, 'from en, for LUT, no original, no format')
+				check('en', null, refWTde, refLUT, { useOriginalBookName: false }, 'from en, for LUT, no original, no format')
+				check('de', null, refWTde, refLUT, { useOriginalBookName: false, language: 'de' }, 'from de, for LUT, no original, de format')
+				check('de', null, refWTde, refKJV, { useOriginalBookName: false, language: 'de' }, 'from de, for KJV, no original, de format')
 			})
 
+			it('should use original and translated book name by option', () => {
+				check('de', 'en', refWTen, refLUT, { translateBookName: true }, 'from en, for LUT, translate')
+				check('de', 'en', refWTde, refLUT, { translateBookName: true }, 'from de, for LUT, translate')
+				check('de', 'en', refWTen, refLUT, { translateBookName: true, language: 'en' }, 'from en, for LUT, translate, en format')
+				check('de', 'en', refWTde, refLUT, { translateBookName: true, language: 'en' }, 'from de, for LUT, translate, en format')
+			})
+
+			it('should use translated and original book name by option', () => {
+				check('en', 'de', refWTen, refLUT, { translateBookName: true, useOriginalBookName: false }, 'from en, for LUT, translate, no original, no format')
+				check('en', 'de', refWTde, refLUT, { translateBookName: true, useOriginalBookName: false }, 'from de, for LUT, translate, no original, no format')
+				check('en', 'de', refWTen, refLUT, { translateBookName: true, useOriginalBookName: false, language: 'en' }, 'from en, for LUT, translate, no original, en format')
+				check('de', 'en', refWTde, refKJV, { translateBookName: true, useOriginalBookName: false, language: 'de' }, 'from de, for KJV, translate, no original, de format')
+			})
+
+			it('should ommit secondary book name if equal to primary', () => {
+				check('en', null, refWTen, refKJV, { translateBookName: true }, 'from en, for KJV, translate, no format')
+				check('de', null, refWTde, refLUT, { translateBookName: true, useOriginalBookName: true, language: 'de' }, 'from de, for LUT, translate, de format')
+			})
 		})
+
 	})
+
 })
