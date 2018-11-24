@@ -291,7 +291,7 @@ describe('MagnaLex.Library', () => {
 				check('de', 'en', refWTde, refKJV, { translateBookName: true, useOriginalBookName: false, language: 'de' }, 'from de, for KJV, translate, no original, de format')
 			})
 
-			it('should ommit secondary book name if equal to primary', () => {
+			it('should omit secondary book name if equal to primary', () => {
 				check('en', null, refWTen, refKJV, { translateBookName: true }, 'from en, for KJV, translate, no format')
 				check('de', null, refWTde, refLUT, { translateBookName: true, useOriginalBookName: true, language: 'de' }, 'from de, for LUT, translate, de format')
 			})

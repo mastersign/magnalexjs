@@ -155,7 +155,7 @@ describe('MagnaLex.Reference', () => {
 			assert.strictEqual(actual, expected, 'did not use full primary and seoncdary book name')
 		})
 
-		it('should ommit secondary book name if it equals the primary one', () => {
+		it('should omit secondary book name if it equals the primary one', () => {
 			const trl = lib.getTranslation('KJV')
 			const bn = lib.findBookName('1Mo', 'en')
 			const bn1 = new magnalex.BookName('Gen', 'XYZ', 'XxYyZz', 'en')
@@ -166,7 +166,7 @@ describe('MagnaLex.Reference', () => {
 			assert.strictEqual(actual, expected, 'did use secondary book name despite its beeing equal to the primary')
 		})
 
-		it('should ommit full secondary book name if it equals the primary one', () => {
+		it('should omit full secondary book name if it equals the primary one', () => {
 			const trl = lib.getTranslation('KJV')
 			const bn = lib.findBookName('1Mo', 'en')
 			const bn1 = new magnalex.BookName('Gen', 'XYZ', 'XxYyZz', 'en')
@@ -247,7 +247,7 @@ describe('MagnaLex.ReferenceRange', () => {
 			assert.strictEqual(actual, expected, 'did not use full primary and seoncdary book name')
 		})
 
-		it('should ommit secondary book name if it equals the primary one', () => {
+		it('should omit secondary book name if it equals the primary one', () => {
 			const trl = lib.getTranslation('KJV')
 			const bn = lib.findBookName('1Mo', 'en')
 			const bn1 = new magnalex.BookName('Gen', 'XYZ', 'XxYyZz', 'en')
@@ -259,7 +259,7 @@ describe('MagnaLex.ReferenceRange', () => {
 			assert.strictEqual(actual, expected, 'did use secondary book name despite its beeing equal to the primary')
 		})
 
-		it('should ommit full secondary book name if it equals the primary one', () => {
+		it('should omit full secondary book name if it equals the primary one', () => {
 			const trl = lib.getTranslation('KJV')
 			const bn = lib.findBookName('1Mo', 'en')
 			const bn1 = new magnalex.BookName('Gen', 'XYZ', 'XxYyZz', 'en')

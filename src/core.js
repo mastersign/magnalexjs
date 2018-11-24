@@ -42,7 +42,7 @@ const _ = require('lodash')
  * @prop {boolean} useOriginalBookName    - A switch to control whether the original book name should be used
  * @prop {boolean} translateBookName      - A switch to control whether a translated book name should be added
  * @prop {boolean} showTranslation        - A switch to control if the translation should be included in references
- * @prop {boolean} hideDefaultTranslation - A switch to control whether the translation is ommited, if it is the default translation
+ * @prop {boolean} hideDefaultTranslation - A switch to control whether the translation is omitted, if it is the default translation
  * @prop {boolean} fullTranslationName    - A switch to control whether the short ID or the full name of a bible translation should be used
  * @prop {string}  cssClass               - The CSS class to apply to the outermost HTML element
  * @prop {string}  texQuoteEnvironment    - The TeX environment to use for block quotes
