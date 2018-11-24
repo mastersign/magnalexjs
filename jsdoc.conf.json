@@ -3,7 +3,7 @@
         "include": [ "./src/" ]
     },
     "opts": {
-        "destination": "./out/",
+        "destination": "./docs/",
         "package": "./package.json",
         "readme": "./README.md"
     },
