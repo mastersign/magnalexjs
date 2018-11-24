@@ -714,13 +714,22 @@ class Library {
 	 * Initialize a new bible library.
 	 */
 	constructor() {
+		/**
+		 * A map with all registered languages, indexed by IETF language tag
+		 * @type {Object.<string, Language>}
+		 */
 		this.languages = {}
+		/**
+		 * A map with all registered translations, indexed by its short name
+		 * @type {Object.<string, Translation>}
+		 */
 		this.translations = {}
 		/**
 		 * An array with all registered bible sources
 		 * @type {Array.<BibleSource>}
 		 */
 		this.sources = []
+
 		this.defaults = {}
 		this.registerPackagedLanguage('en')
 		this.registerPackagedLanguage('de')
