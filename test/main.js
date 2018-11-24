@@ -184,6 +184,7 @@ describe('MagnaLex.Library', () => {
 
 		function checkOptBookNames(actualOpt, expectedPrimaryLangTag, expectedSecondaryLangTag, msg) {
 			if (expectedPrimaryLangTag) {
+				assert.ok(actualOpt.primaryBookName, 'Primary book name is not set. ' + msg)
 				assert.strictEqual(actualOpt.primaryBookName.langTag, expectedPrimaryLangTag,
 					'Language of primary book name does not match. ' + msg)
 				assert.strictEqual(actualOpt.primaryBookName.shortName, bns[expectedPrimaryLangTag],
@@ -192,6 +193,7 @@ describe('MagnaLex.Library', () => {
 				assert.ok(!actualOpt.primaryBookName, 'Primary book name is set. ' + msg)
 			}
 			if (expectedSecondaryLangTag) {
+				assert.ok(actualOpt.secondaryBookName, 'Secondary book name is not set. ' + msg)
 				assert.strictEqual(actualOpt.secondaryBookName.langTag, expectedSecondaryLangTag,
 					'Language of secondary book name does not match. ' + msg)
 				assert.strictEqual(actualOpt.secondaryBookName.shortName, bns[expectedSecondaryLangTag],
