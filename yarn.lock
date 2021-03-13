@@ -282,7 +282,7 @@ xmlbible-lut1912@^1.0.0:
   resolved "https://registry.yarnpkg.com/xmlbible-lut1912/-/xmlbible-lut1912-1.0.0.tgz#a1e290827b5a9132086b98550f72a7f6350e87e3"
   integrity sha512-xh/A4Vy7NRO0ckD4zxLecvWI9nqVf4DrPqL8eQI+xXI1UXZ/1txDiHGxeGbQkuN1MbyioUs4Vg2JL7GBRfbzUA==
 
-xmldom@^0.1.27:
-  version "0.1.27"
-  resolved "https://registry.yarnpkg.com/xmldom/-/xmldom-0.1.27.tgz#d501f97b3bdb403af8ef9ecc20573187aadac0e9"
-  integrity sha1-1QH5ezvbQDr4757MIFcxh6rawOk=
+xmldom@^0.5.0:
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/xmldom/-/xmldom-0.5.0.tgz#193cb96b84aa3486127ea6272c4596354cb4962e"
+  integrity sha512-Foaj5FXVzgn7xFzsKeNIde9g6aFBxTPi37iwsno8QvApmtg7KYrr+OPyRHcJF7dud2a5nGRBXK3n0dL62Gf7PA==
