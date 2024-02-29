@@ -1188,7 +1188,7 @@ function buildReferencePatterns(delimiters, books) {
 			'(\\d+)',
 			delims.chapterToVerse,
 			'(\\d+)',
-			delims.chapterRange,
+			delims.range,
 			'(\\d+)',
 			delims.chapterToVerse,
 			'(\\d+)',
