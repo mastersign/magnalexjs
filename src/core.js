@@ -189,7 +189,7 @@ class Translation {
 class VerseLocation {
 
 	/**
-	 * @param {number}      chapterNo - The number of the chapter (one-based)
+	 * @param {number}  chapterNo - The number of the chapter (one-based)
 	 * @param {?number} verseNo   - The number of the verse (one-based), or null if he whole chapter is referenced
 	 */
 	constructor(chapterNo, verseNo) {
