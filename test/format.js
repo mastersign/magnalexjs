@@ -54,6 +54,16 @@ describe('MagnaLex.Library', () => {
 			fileCase('single', ctx.lib, ref, f, { language: 'de' })
 		})
 
+		it('should format single verse with unicode superscript', () => {
+			const ref = ctx.lib.parseReference('Joh 3:16 [KJV]', 'en')
+			fileCase('unicode_superscript', ctx.lib, ref, f, { unicodeSuperscript: true })
+		})
+
+		it('should format single verse with space after verse no', () => {
+			const ref = ctx.lib.parseReference('Joh 3:16 [KJV]', 'en')
+			fileCase('verse_no_space', ctx.lib, ref, f, { verseNoSpace: false })
+		})
+
 		it('should format verse range', () => {
 			const ref = ctx.lib.parseReference('Joh 1:1-3 [KJV]', 'en')
 			fileCase('range', ctx.lib, ref, f, {})

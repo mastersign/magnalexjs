@@ -36,16 +36,19 @@ const _ = require('lodash')
 /**
  * @typedef FormatOptions
  * @type {Object}
- * @prop {string}  language               - The language to use for formatting as IETF tag
- * @prop {boolean} verseNewLine           - A switch to control whether every verse starts on its own line or not
- * @prop {boolean} fullBookName           - A switch to control whether the short or the full book name should be used
- * @prop {boolean} useOriginalBookName    - A switch to control whether the original book name should be used
- * @prop {boolean} translateBookName      - A switch to control whether a translated book name should be added
- * @prop {boolean} showTranslation        - A switch to control if the translation should be included in references
- * @prop {boolean} hideDefaultTranslation - A switch to control whether the translation is omitted, if it is the default translation
- * @prop {boolean} fullTranslationName    - A switch to control whether the short ID or the full name of a bible translation should be used
- * @prop {string}  cssClass               - The CSS class to apply to the outermost HTML element
- * @prop {string}  texQuoteEnvironment    - The TeX environment to use for block quotes
+ * @prop {string}  language                - The language to use for formatting as IETF tag
+ * @prop {boolean} verseNewLine            - A switch to control whether every verse starts on its own line or not
+ * @prop {boolean} fullBookName            - A switch to control whether the short or the full book name should be used
+ * @prop {boolean} useOriginalBookName     - A switch to control whether the original book name should be used
+ * @prop {boolean} translateBookName       - A switch to control whether a translated book name should be added
+ * @prop {boolean} showTranslation         - A switch to control if the translation should be included in references
+ * @prop {boolean} hideDefaultTranslation  - A switch to control whether the translation is omitted, if it is the default translation
+ * @prop {boolean} fullTranslationName     - A switch to control whether the short ID or the full name of a bible translation should be used
+ * @prop {boolean} unicodeSuperscript      - A switch to control whether to use unicode superscript characters for verse numbers
+ * @prop {boolean} verseNoSpace            - A switch to control whether a space separates the verse number from the verse text
+ * @prop {string}  cssClass                - The CSS class to apply to the outermost HTML element
+ * @prop {string}  chapterHeadlineCssClass - The CSS class to apply to a chapter headline
+ * @prop {string}  texQuoteEnvironment     - The TeX environment to use for block quotes
  */
 
 const defaultFormat = {
@@ -57,12 +60,37 @@ const defaultFormat = {
 	showTranslation: true,
 	hideDefaultTranslation: false,
 	fullTranslationName: false,
-	cssClass: 'mdbible',
+	unicodeSuperscript: false,
+	verseNoSpace: true,
+	cssClass: 'magnalex',
+	chapterHeadlineCssClass: 'chapter-headline',
 	texQuoteEnvironment: 'quote',
 }
 
 function formatCfg(opt, propName) {
 	return _.get(opt, propName, _.get(defaultFormat, propName))
+}
+
+const superscriptCharacters = [
+	0x2070,
+	0x00B9,
+	0x00B2,
+	0x00B3,
+	0x2074,
+	0x2075,
+	0x2076,
+	0x2077,
+	0x2078,
+	0x2079,
+]
+
+function unicodeVerseNumbers(no) {
+	const noStr = '' + no
+	let result = ''
+	for (let i = 0; i < noStr.length; i++) {
+		result += String.fromCharCode(superscriptCharacters[noStr.charCodeAt(i) - 0x30])
+	}
+	return result
 }
 
 /**
@@ -1023,6 +1051,7 @@ class Library {
 		const quoteSrcOpt = this.setupQuoteSourceOptions(reference, exampleReference, opt)
 		const l = this.getLanguage(formatCfg(opt, 'language') || exampleReference.translation.langTag)
 		const vnl = formatCfg(opt, 'verseNewLine')
+		const unicodeSuperscript = formatCfg(opt, 'unicodeSuperscript')
 		const lines = []
 		let firstContent = true
 		let cNo = _.size(_.groupBy(verses, v => v.reference.chapterNo)) > 1 ?
@@ -1036,9 +1065,12 @@ class Library {
 				lines.push('**' + l.vocabulary.chapter + ' ' + cNo + '**')
 				lines.push('')
 			}
-			lines.push('^' + r.verseNo + '^ ' + v.text.trim() + (vnl ? '  ' : ''))
+			const noStr = unicodeSuperscript
+				? unicodeVerseNumbers(r.verseNo)
+				: '^' + r.verseNo + '^'
+			lines.push(noStr + ' ' + v.text.trim() + (vnl ? '  ' : ''))
 			firstContent = false
-		});
+		})
 		lines.push('')
 		lines.push('_' + reference.format(this, quoteSrcOpt) + '_')
 		return _.join(_.map(lines, l => '> ' + l), os.EOL)
@@ -1057,7 +1089,9 @@ class Library {
 		const l = this.getLanguage(formatCfg(opt, 'language') || exampleReference.translation.langTag)
 		const quoteSrcOpt = this.setupQuoteSourceOptions(reference, exampleReference, opt)
 		const vnl = formatCfg(opt, 'verseNewLine')
+		const unicodeSuperscript = formatCfg(opt, 'unicodeSuperscript')
 		const cssClass = formatCfg(opt, 'cssClass')
+		const chapterHeadlineCssClass = formatCfg(opt, 'chapterHeadlineCssClass')
 		const lines = []
 		let cNo = _.size(_.groupBy(verses, v => v.reference.chapterNo)) > 1 ?
 			null :
@@ -1074,7 +1108,7 @@ class Library {
 			if (cNo !== r.chapterNo) {
 				cNo = r.chapterNo
 				if (!firstContent) lines.push('</p>')
-				lines.push('<p class="magnalex-chapter-headline">')
+				lines.push('<p class="' + chapterHeadlineCssClass + '">')
 				lines.push('<strong>' + l.vocabulary.chapter + ' ' + cNo + '</strong>')
 				lines.push('</p>')
 				if (!firstContent) lines.push('<p>')
@@ -1084,8 +1118,11 @@ class Library {
 				lines.push('<p>')
 				firstContent = false
 			}
+			const noStr = unicodeSuperscript
+				? unicodeVerseNumbers(r.verseNo)
+				: '<sup>' + r.verseNo + '</sup>'
 			lines.push(((vnl && !firstVerse) ? '<br>' : '') +
-				'<sup>' + r.verseNo + '</sup>' + v.text.trim())
+				noStr + ' ' + v.text.trim())
 			firstVerse = false
 		})
 		lines.push('</p>')
@@ -1107,6 +1144,7 @@ class Library {
 		const l = this.getLanguage(formatCfg(opt, 'language') || exampleReference.translation.langTag)
 		const quoteSrcOpt = this.setupQuoteSourceOptions(reference, exampleReference, opt)
 		const vnl = formatCfg(opt, 'verseNewLine')
+		const unicodeSuperscript = formatCfg(opt, 'unicodeSuperscript')
 		const env = formatCfg(opt, 'texQuoteEnvironment')
 		const lines = []
 		let firstVerse = true
@@ -1122,8 +1160,11 @@ class Library {
 				lines.push('')
 				firstVerse = true
 			}
+			const noStr = unicodeSuperscript
+				? unicodeVerseNumbers(r.verseNo)
+				: '\\textsuperscript{' + r.verseNo + '}'
 			lines.push(((vnl && !firstVerse) ? '\\newline' : '') +
-				'\\textsuperscript{' + r.verseNo + '}' + v.text.trim())
+				noStr + ' ' + v.text.trim())
 			firstVerse = false
 		})
 		lines.push('')
