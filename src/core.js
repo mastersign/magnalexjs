@@ -1074,7 +1074,7 @@ class Library {
 			if (cNo !== r.chapterNo) {
 				cNo = r.chapterNo
 				if (!firstContent) lines.push('</p>')
-				lines.push('<p class="mdbible-chapter-headline">')
+				lines.push('<p class="magnalex-chapter-headline">')
 				lines.push('<strong>' + l.vocabulary.chapter + ' ' + cNo + '</strong>')
 				lines.push('</p>')
 				if (!firstContent) lines.push('<p>')
